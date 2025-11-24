@@ -1,6 +1,5 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
-import Hero3D from '../components/Hero3D';
 import FeaturesSection from '../components/FeaturesSection';
 import ProcessSection from '../components/ProcessSection';
 import TestimonialsSection from '../components/TestimonialsSection';
@@ -8,14 +7,12 @@ import ParticlesBackground from '../components/ParticlesBackground';
 
 const Home = () => {
     return (
-        <div className="relative">
+        <div className="relative" style={{ zIndex: 10 }}>
             <ParticlesBackground />
 
             {/* Hero Section */}
             <section className="relative h-screen flex items-center justify-center overflow-hidden">
-                <div className="absolute inset-0 z-0">
-                    <Hero3D />
-                </div>
+                {/* Hero3D is now global in Layout */}
 
                 <div className="container relative z-10 text-center">
                     <h1 className="text-5xl md:text-7xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-600 animate-pulse drop-shadow-lg">

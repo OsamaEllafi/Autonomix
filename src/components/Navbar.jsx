@@ -24,7 +24,7 @@ const Navbar = () => {
     ];
 
     return (
-        <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'glass py-4' : 'py-6 bg-transparent'}`}>
+        <nav className={`fixed w-full transition-all duration-300 ${scrolled ? 'glass py-4' : 'py-6 bg-transparent'}`} style={{ zIndex: 100 }}>
             <div className="container flex justify-between items-center">
                 <Link to="/" className="text-2xl font-bold font-header tracking-wider">
                     AUTONOM<span className="text-primary">IX</span>

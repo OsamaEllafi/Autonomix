@@ -2,7 +2,7 @@ import React from 'react';
 
 const About = () => {
     return (
-        <div className="pt-32 pb-20 container">
+        <div className="pt-20 pb-20 container" style={{ position: 'relative', zIndex: 10 }}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
                 <div>
                     <h1 className="text-4xl md:text-6xl font-bold font-header mb-8">
