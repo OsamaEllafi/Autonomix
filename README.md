@@ -1,4 +1,21 @@
-# React + Vite
+# Autonomix
+
+React + Vite site, configured for deployment as a **static site on GitHub Pages** (HTML, CSS, JS only). The app is built into the `dist` folder and deployed via GitHub Actions.
+
+## Deploy to GitHub Pages
+
+1. Push this repo to GitHub (e.g. repo name `Autonomix`).
+2. In the repo: **Settings → Pages → Build and deployment**
+   - **Source:** choose **GitHub Actions**.
+3. Push to the `main` branch (or run the workflow from the **Actions** tab). The workflow builds the app and deploys it.
+4. The site will be at: **`https://<your-username>.github.io/Autonomix/`**  
+   (Replace `Autonomix` with your repo name if different.)
+
+Direct links and refresh work on all routes (e.g. `/about`, `/services`) thanks to the 404.html SPA fallback.
+
+---
+
+## React + Vite (dev)
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
