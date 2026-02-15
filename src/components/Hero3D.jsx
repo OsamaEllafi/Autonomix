@@ -3,6 +3,9 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 
+const MOBILE_BREAKPOINT = 768;
+const MIN_SCALE = 0.5;
+
 // Generate positions on sphere surface (uniform distribution)
 function sphereSurfacePoints(count, radius = 1) {
   const positions = new Float32Array(count * 3);
@@ -38,11 +41,12 @@ const ParticleSphere = () => {
   useFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.getElapsedTime();
+    const width = state.size?.width ?? MOBILE_BREAKPOINT;
+    const scaleFactor = Math.max(MIN_SCALE, Math.min(1, width / MOBILE_BREAKPOINT));
     ref.current.rotation.x = t * 0.15;
     ref.current.rotation.y = t * 0.2;
-    // Slight depth movement (subtle scale pulse)
-    const scale = 2.4 + Math.sin(t * 0.5) * 0.08;
-    ref.current.scale.setScalar(scale);
+    const baseScale = 2.4 + Math.sin(t * 0.5) * 0.08;
+    ref.current.scale.setScalar(baseScale * scaleFactor);
   });
 
   return (
@@ -68,8 +72,11 @@ const AmbientParticles = () => {
   useFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.getElapsedTime();
+    const width = state.size?.width ?? MOBILE_BREAKPOINT;
+    const scaleFactor = Math.max(MIN_SCALE, Math.min(1, width / MOBILE_BREAKPOINT));
     ref.current.rotation.x = t * 0.06;
     ref.current.rotation.y = t * 0.08;
+    ref.current.scale.setScalar(scaleFactor);
   });
 
   return (
