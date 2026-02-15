@@ -15,7 +15,7 @@ const Home = () => {
                 {/* Hero3D is now global in Layout */}
 
                 <div className="container relative z-10 text-center">
-                    <h1 className="text-5xl md:text-7xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-600 animate-pulse drop-shadow-lg">
+                    <h1 className="text-5xl md:text-7xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 animate-pulse drop-shadow-lg">
                         FUTURE OF <br />
                         <span className="text-white drop-shadow-md">AUTOMATION</span>
                     </h1>

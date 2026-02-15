@@ -7,10 +7,10 @@ export default {
     theme: {
         extend: {
             colors: {
-                primary: '#00f3ff',
-                secondary: '#bc13fe',
-                dim: '#a1a1a1',
-                'glass-border': 'rgba(255, 255, 255, 0.1)',
+                primary: '#ffffff',
+                secondary: '#a0a0a0',
+                dim: '#888888',
+                'glass-border': 'rgba(255, 255, 255, 0.12)',
             },
             fontFamily: {
                 header: ['Orbitron', 'sans-serif'],

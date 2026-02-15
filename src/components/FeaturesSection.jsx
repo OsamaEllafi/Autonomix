@@ -44,7 +44,7 @@ const FeaturesSection = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, delay: index * 0.1 }}
                             viewport={{ once: true }}
-                            className="glass p-6 rounded-xl border border-glass-border hover:border-primary transition-all duration-300 hover:shadow-[0_0_30px_rgba(0,243,255,0.15)] group"
+                            className="glass p-6 rounded-xl border border-glass-border hover:border-primary transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.12)] group"
                         >
                             <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform">
                                 {feature.icon}

@@ -48,7 +48,7 @@ const ProcessSection = () => {
                             viewport={{ once: true }}
                             className="relative z-10"
                         >
-                            <div className="w-24 h-24 bg-black border border-glass-border rounded-full flex items-center justify-center text-3xl font-header font-bold text-transparent bg-clip-text bg-gradient-to-br from-primary to-secondary mb-6 mx-auto shadow-[0_0_20px_rgba(188,19,254,0.2)]">
+                            <div className="w-24 h-24 bg-black border border-glass-border rounded-full flex items-center justify-center text-3xl font-header font-bold text-transparent bg-clip-text bg-gradient-to-br from-primary to-secondary mb-6 mx-auto shadow-[0_0_20px_rgba(255,255,255,0.15)]">
                                 {step.number}
                             </div>
                             <div className="text-center">
