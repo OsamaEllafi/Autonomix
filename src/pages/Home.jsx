@@ -11,7 +11,10 @@ const Home = () => {
             <ParticlesBackground />
 
             {/* Hero Section */}
-            <section className="relative h-screen flex items-center justify-center overflow-hidden">
+            <section
+                className="relative h-screen flex items-center justify-center overflow-hidden"
+                data-3d-section="hero"
+            >
                 {/* Hero3D is now global in Layout */}
 
                 <div className="container relative z-10 text-center">
@@ -36,11 +39,15 @@ const Home = () => {
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--bg-dark)] pointer-events-none"></div>
             </section>
 
-            <FeaturesSection />
-            <ProcessSection />
+            <div data-3d-section="features">
+                <FeaturesSection />
+            </div>
+            <div data-3d-section="process">
+                <ProcessSection />
+            </div>
 
             {/* Services Preview */}
-            <section className="py-20 container relative z-10">
+            <section className="py-20 container relative z-10" data-3d-section="services">
                 <h2 className="text-3xl font-header mb-10 text-center">Our <span className="text-primary">Services</span></h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {[1, 2, 3].map((i) => (
@@ -55,7 +62,9 @@ const Home = () => {
                 </div>
             </section>
 
-            <TestimonialsSection />
+            <div data-3d-section="testimonials">
+                <TestimonialsSection />
+            </div>
         </div>
     );
 };

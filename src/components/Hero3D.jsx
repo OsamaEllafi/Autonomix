@@ -1,7 +1,9 @@
-import React, { useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import React, { useRef, useMemo, useEffect } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const MOBILE_BREAKPOINT = 768;
 const MIN_SCALE = 0.5;
@@ -94,6 +96,73 @@ const AmbientParticles = () => {
   );
 };
 
+const CameraController = () => {
+  const { camera } = useThree();
+  const target = useRef({
+    z: 7,
+    xRot: 0,
+    yRot: 0,
+  });
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const sections = document.querySelectorAll('[data-3d-section]');
+
+    // Camera keyframes per section:
+    // 0: Hero       -> outside sphere (current look)
+    // 1: Why Autonomix (features) -> move smoothly fully inside
+    // 2: How We Work (process)    -> exit back out on a different side
+    // 3: Our Services             -> enter inside again from another angle
+    // 4: Client Stories           -> exit once more for a final view
+    const configs = [
+      { z: 7, xRot: 0, yRot: 0 },            // Hero - fully outside
+      { z: 0.6, xRot: -0.12, yRot: 0.3 },    // Features - clearly inside
+      { z: 3.5, xRot: 0.06, yRot: 0.9 },     // Process - back outside, rotated
+      { z: 0.6, xRot: -0.18, yRot: 1.5 },    // Services - inside again, different side
+      { z: 3.5, xRot: 0.12, yRot: 2.1 },     // Testimonials - outside, further rotation
+    ];
+
+    const triggers = [];
+
+    sections.forEach((section, index) => {
+      const cfg = configs[Math.min(index, configs.length - 1)];
+
+      const tween = gsap.to(target.current, {
+        z: cfg.z,
+        xRot: cfg.xRot,
+        yRot: cfg.yRot,
+        ease: 'power3.inOut',
+        scrollTrigger: {
+          trigger: section,
+          start: 'top center',
+          end: 'bottom center',
+          scrub: true,
+        },
+      });
+
+      if (tween.scrollTrigger) {
+        triggers.push(tween.scrollTrigger);
+      }
+    });
+
+    return () => {
+      triggers.forEach((t) => t.kill());
+    };
+  }, []);
+
+  useFrame((state, delta) => {
+    const { z, xRot, yRot } = target.current;
+    const damp = 4 * delta;
+
+    camera.position.z += (z - camera.position.z) * damp;
+    camera.rotation.x += (xRot - camera.rotation.x) * damp;
+    camera.rotation.y += (yRot - camera.rotation.y) * damp;
+  });
+
+  return null;
+};
+
 const Hero3D = () => {
   return (
     <div className="w-full h-full" style={{ background: '#000000' }}>
@@ -104,6 +173,7 @@ const Hero3D = () => {
           scene.background = new THREE.Color(0x000000);
         }}
       >
+        <CameraController />
         <ParticleSphere />
         <AmbientParticles />
       </Canvas>
