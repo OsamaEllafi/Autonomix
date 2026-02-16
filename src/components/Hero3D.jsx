@@ -109,19 +109,28 @@ const CameraController = () => {
 
     const sections = document.querySelectorAll('[data-3d-section]');
 
-    // Camera keyframes per section:
-    // 0: Hero       -> outside sphere (current look)
-    // 1: Why Autonomix (features) -> move smoothly fully inside
-    // 2: How We Work (process)    -> exit back out on a different side
-    // 3: Our Services             -> enter inside again from another angle
-    // 4: Client Stories           -> exit once more for a final view
-    const configs = [
+    const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
+
+    // Desktop path: more dramatic in/out motion.
+    const desktopConfigs = [
       { z: 7, xRot: 0, yRot: 0 },            // Hero - fully outside
       { z: 0.6, xRot: -0.12, yRot: 0.3 },    // Features - clearly inside
       { z: 3.5, xRot: 0.06, yRot: 0.9 },     // Process - back outside, rotated
       { z: 0.6, xRot: -0.18, yRot: 1.5 },    // Services - inside again, different side
       { z: 3.5, xRot: 0.12, yRot: 2.1 },     // Testimonials - outside, further rotation
     ];
+
+    // Mobile path: keep the sphere more centered and avoid getting too close,
+    // so it stays inside the narrower/taller viewport.
+    const mobileConfigs = [
+      { z: 7, xRot: 0, yRot: 0 },            // Hero - outside, same as desktop
+      { z: 1.6, xRot: -0.08, yRot: 0.25 },   // Features - inside but not too close
+      { z: 3.8, xRot: 0.04, yRot: 0.8 },     // Process - back outside, gentle rotation
+      { z: 1.6, xRot: -0.12, yRot: 1.3 },    // Services - inside again, different side
+      { z: 3.8, xRot: 0.08, yRot: 1.9 },     // Testimonials - outside again
+    ];
+
+    const configs = isMobile ? mobileConfigs : desktopConfigs;
 
     const triggers = [];
 
