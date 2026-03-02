@@ -7,15 +7,16 @@ export default {
     theme: {
         extend: {
             colors: {
-                primary: '#ffffff',
-                secondary: '#a0a0a0',
-                dim: '#888888',
-                'glass-border': 'rgba(255, 255, 255, 0.12)',
+                primary: '#0f1117',
+                secondary: '#3b3f51',
+                accent: '#5a5f73',
+                dim: '#6b7085',
+                'glass-border': 'rgba(15, 17, 23, 0.07)',
             },
             fontFamily: {
                 header: ['Orbitron', 'sans-serif'],
                 main: ['Inter', 'sans-serif'],
-            }
+            },
         },
     },
     plugins: [],
