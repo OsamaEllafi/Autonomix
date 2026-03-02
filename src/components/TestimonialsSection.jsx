@@ -1,51 +1,186 @@
-import React from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Quote } from 'lucide-react';
 
 const testimonials = [
-    { quote: "Autonomix revolutionized our customer support. We reduced response times by 80% while increasing satisfaction scores.", author: "Sarah Jenkins", role: "CTO, TechFlow" },
-    { quote: "The AI agents they built for us are indistinguishable from human operators. Truly next-level technology.", author: "Marcus Chen", role: "Director of Ops, Nexus" },
-    { quote: "Implementation was flawless. Their team understood our complex requirements and delivered ahead of schedule.", author: "Elena Rodriguez", role: "VP of Engineering, Solara" },
+    {
+        quote: "Autonomix revolutionized our customer support. We reduced response times by 80% while increasing satisfaction scores.",
+        author: "Sarah Jenkins",
+        role: "CTO, TechFlow",
+    },
+    {
+        quote: "The AI agents they built for us are indistinguishable from human operators. Truly next-level technology.",
+        author: "Marcus Chen",
+        role: "Director of Ops, Nexus",
+    },
+    {
+        quote: "Implementation was flawless. Their team understood our complex requirements and delivered ahead of schedule.",
+        author: "Elena Rodriguez",
+        role: "VP of Engineering, Solara",
+    },
+    {
+        quote: "Their automation solutions saved us over 200 hours per month. The ROI was visible within the first week.",
+        author: "David Kim",
+        role: "Founder, DataPulse",
+    },
+    {
+        quote: "We've partnered with many tech firms, but Autonomix stands out for their innovation and attention to detail.",
+        author: "Amira Patel",
+        role: "COO, BrightEdge",
+    },
 ];
 
+const CARD_WIDTH = 240;
+const CARD_GAP = 20;
+const SLIDE_UNIT = CARD_WIDTH + CARD_GAP;
+const ANIM_DURATION = 3000;
+
+const RECT_MAX_WIDTH = 820;
+
 const TestimonialsSection = () => {
+    const trackRef = useRef(null);
+    const [offset, setOffset] = useState(0);
+    const [isHovered, setIsHovered] = useState(false);
+    const animRef = useRef(null);
+    const lastTimeRef = useRef(null);
+
+    const extendedTestimonials = [...testimonials, ...testimonials, ...testimonials];
+    const totalOriginalWidth = testimonials.length * SLIDE_UNIT;
+
+    const animate = useCallback(
+        (timestamp) => {
+            if (!lastTimeRef.current) lastTimeRef.current = timestamp;
+            const delta = timestamp - lastTimeRef.current;
+            lastTimeRef.current = timestamp;
+
+            if (!isHovered) {
+                setOffset((prev) => {
+                    let next = prev + (delta / ANIM_DURATION) * SLIDE_UNIT;
+                    if (next >= totalOriginalWidth) {
+                        next -= totalOriginalWidth;
+                    }
+                    return next;
+                });
+            }
+
+            animRef.current = requestAnimationFrame(animate);
+        },
+        [isHovered, totalOriginalWidth]
+    );
+
+    useEffect(() => {
+        animRef.current = requestAnimationFrame(animate);
+        return () => {
+            if (animRef.current) cancelAnimationFrame(animRef.current);
+        };
+    }, [animate]);
+
     return (
-        <section className="py-24">
-            <div className="container">
+        <section className="testimonials-section" id="testimonials">
+            {/* White rectangle backdrop — centered, covers header + card area */}
+            <div className="testimonials-rectangle" />
+
+            {/* Content layer on top of the rectangle */}
+            <div className="testimonials-content">
                 <motion.div
-                    className="text-center mb-16"
+                    className="testimonials-header"
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
                     viewport={{ once: true }}
                 >
-                    <h2 className="text-3xl md:text-4xl font-header font-bold mb-4 text-primary">Client Stories</h2>
-                    <div className="section-accent-line" />
+                    <div className="testimonials-quote-bg">"</div>
+                    <h2 className="testimonials-title">
+                        What our Clients say!
+                    </h2>
+                    <div className="testimonials-title-underline" />
                 </motion.div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {testimonials.map((item, index) => (
-                        <motion.div
-                            key={index}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: index * 0.1 }}
-                            viewport={{ once: true }}
-                            className="glass p-8 rounded-2xl relative group hover:-translate-y-1 transition-all duration-300"
-                        >
-                            <Quote className="absolute top-6 left-6 text-primary/[0.06]" size={40} />
-                            <p className="text-sm text-dim mb-8 relative z-10 italic leading-relaxed">"{item.quote}"</p>
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-primary/[0.08] flex items-center justify-center text-primary/50 font-bold text-xs font-header">
-                                    {item.author.split(' ').map(n => n[0]).join('')}
+                {/* Full-width carousel — cards slide across entire viewport */}
+                <div
+                    className="testimonials-carousel-wrapper"
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => {
+                        setIsHovered(false);
+                        lastTimeRef.current = null;
+                    }}
+                >
+                    <div
+                        className="testimonials-track"
+                        ref={trackRef}
+                        style={{
+                            transform: `translateX(${-offset}px)`,
+                        }}
+                    >
+                        {extendedTestimonials.map((item, index) => {
+                            const containerWidth =
+                                typeof window !== 'undefined' ? window.innerWidth : 1200;
+                            const centerX = containerWidth / 2;
+                            const cardCenter =
+                                index * SLIDE_UNIT + CARD_WIDTH / 2 - offset;
+
+                            // Rectangle boundaries
+                            const rectWidth = Math.min(RECT_MAX_WIDTH, containerWidth * 0.65);
+                            const rectLeft = centerX - rectWidth / 2;
+                            const rectRight = centerX + rectWidth / 2;
+
+                            // How much of the card overlaps with the rectangle
+                            const cardLeft = cardCenter - CARD_WIDTH / 2;
+                            const cardRight = cardCenter + CARD_WIDTH / 2;
+                            const overlapLeft = Math.max(cardLeft, rectLeft);
+                            const overlapRight = Math.min(cardRight, rectRight);
+                            const overlap = Math.max(0, overlapRight - overlapLeft);
+                            const insideRatio = overlap / CARD_WIDTH;
+
+                            const scale = 0.82 + insideRatio * 0.18;
+                            const shadowOpacity = 0.02 + insideRatio * 0.1;
+                            const yShift = (1 - insideRatio) * 8;
+                            const zIndex = Math.round(insideRatio * 10);
+
+                            return (
+                                <div
+                                    key={index}
+                                    className="testimonial-card"
+                                    style={{
+                                        width: CARD_WIDTH,
+                                        minWidth: CARD_WIDTH,
+                                        marginRight: CARD_GAP,
+                                        transform: `scale(${scale}) translateY(${yShift}px)`,
+                                        boxShadow: `0 ${2 + insideRatio * 18}px ${8 + insideRatio * 34}px rgba(0, 0, 0, ${shadowOpacity})`,
+                                        zIndex,
+                                        opacity: 0.45 + insideRatio * 0.55,
+                                    }}
+                                >
+                                    <div className="testimonial-card-inner">
+                                        <div className="testimonial-avatar">
+                                            <span className="testimonial-avatar-initials">
+                                                {item.author
+                                                    .split(' ')
+                                                    .map((n) => n[0])
+                                                    .join('')}
+                                            </span>
+                                        </div>
+
+                                        <h4 className="testimonial-author">
+                                            {item.author}
+                                        </h4>
+                                        <p className="testimonial-role">{item.role}</p>
+
+                                        <div className="testimonial-quote-wrapper">
+                                            <span className="testimonial-quote-mark top-left">
+                                                "
+                                            </span>
+                                            <p className="testimonial-quote-text">
+                                                {item.quote}
+                                            </p>
+                                            <span className="testimonial-quote-mark bottom-right">
+                                                "
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h4 className="font-bold text-primary text-sm">{item.author}</h4>
-                                    <p className="text-xs text-dim">{item.role}</p>
-                                </div>
-                            </div>
-                        </motion.div>
-                    ))}
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
         </section>
