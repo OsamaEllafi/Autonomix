@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 
 const testimonials = [
@@ -29,57 +29,149 @@ const testimonials = [
     },
 ];
 
-const CARD_WIDTH = 240;
-const CARD_GAP = 20;
-const SLIDE_UNIT = CARD_WIDTH + CARD_GAP;
-const ANIM_DURATION = 3000;
-
 const RECT_MAX_WIDTH = 820;
 
 const TestimonialsSection = () => {
     const trackRef = useRef(null);
-    const [offset, setOffset] = useState(0);
-    const [isHovered, setIsHovered] = useState(false);
+    const cardRefs = useRef([]);
+    const offsetRef = useRef(0);
     const animRef = useRef(null);
     const lastTimeRef = useRef(null);
+    const isHoveredRef = useRef(false);
+    const dimsRef = useRef({ cardWidth: 240, cardGap: 20, speed: 3000 });
 
+    // Triple the list for seamless looping
     const extendedTestimonials = [...testimonials, ...testimonials, ...testimonials];
-    const totalOriginalWidth = testimonials.length * SLIDE_UNIT;
 
-    const animate = useCallback(
-        (timestamp) => {
+    // Recalculate dimensions on mount and resize
+    useEffect(() => {
+        const updateDims = () => {
+            const w = window.innerWidth;
+            if (w <= 480) {
+                dimsRef.current = { cardWidth: 180, cardGap: 14, speed: 4000 };
+            } else if (w <= 768) {
+                dimsRef.current = { cardWidth: 200, cardGap: 16, speed: 3500 };
+            } else {
+                dimsRef.current = { cardWidth: 240, cardGap: 20, speed: 3000 };
+            }
+            // Update card widths directly
+            cardRefs.current.forEach((el) => {
+                if (el) {
+                    el.style.width = dimsRef.current.cardWidth + 'px';
+                    el.style.minWidth = dimsRef.current.cardWidth + 'px';
+                    el.style.marginRight = dimsRef.current.cardGap + 'px';
+                }
+            });
+        };
+        updateDims();
+        window.addEventListener('resize', updateDims, { passive: true });
+        return () => window.removeEventListener('resize', updateDims);
+    }, []);
+
+    // Animation loop — direct DOM manipulation, no React state
+    useEffect(() => {
+        const animate = (timestamp) => {
             if (!lastTimeRef.current) lastTimeRef.current = timestamp;
             const delta = timestamp - lastTimeRef.current;
             lastTimeRef.current = timestamp;
 
-            if (!isHovered) {
-                setOffset((prev) => {
-                    let next = prev + (delta / ANIM_DURATION) * SLIDE_UNIT;
-                    if (next >= totalOriginalWidth) {
-                        next -= totalOriginalWidth;
-                    }
-                    return next;
-                });
+            const { cardWidth, cardGap, speed } = dimsRef.current;
+            const slideUnit = cardWidth + cardGap;
+            const totalOriginalWidth = testimonials.length * slideUnit;
+
+            if (!isHoveredRef.current) {
+                offsetRef.current += (delta / speed) * slideUnit;
+                if (offsetRef.current >= totalOriginalWidth) {
+                    offsetRef.current -= totalOriginalWidth;
+                }
+            }
+
+            const offset = offsetRef.current;
+
+            // Move the track — GPU-accelerated via translate3d
+            if (trackRef.current) {
+                trackRef.current.style.transform = `translate3d(${-offset}px, 0, 0)`;
+            }
+
+            // Update each card's style directly
+            const vw = window.innerWidth;
+            const centerX = vw / 2;
+            const rectWidth = Math.min(RECT_MAX_WIDTH, vw * 0.65);
+            const rectLeft = centerX - rectWidth / 2;
+            const rectRight = centerX + rectWidth / 2;
+
+            const len = cardRefs.current.length;
+            for (let i = 0; i < len; i++) {
+                const el = cardRefs.current[i];
+                if (!el) continue;
+
+                const cardCenter = i * slideUnit + cardWidth / 2 - offset;
+                const cardLeft = cardCenter - cardWidth / 2;
+                const cardRight = cardCenter + cardWidth / 2;
+                const overlapLeft = cardLeft > rectLeft ? cardLeft : rectLeft;
+                const overlapRight = cardRight < rectRight ? cardRight : rectRight;
+                const overlap = overlapRight - overlapLeft;
+                const t = overlap > 0 ? overlap / cardWidth : 0;
+
+                const scale = 0.82 + t * 0.18;
+                const yShift = (1 - t) * 8;
+                const opacity = 0.45 + t * 0.55;
+                const shadowY = 2 + t * 18;
+                const shadowBlur = 8 + t * 34;
+                const shadowAlpha = 0.02 + t * 0.1;
+
+                el.style.transform = `scale(${scale}) translateY(${yShift}px)`;
+                el.style.opacity = opacity;
+                el.style.boxShadow = `0 ${shadowY}px ${shadowBlur}px rgba(0,0,0,${shadowAlpha})`;
+                el.style.zIndex = Math.round(t * 10);
             }
 
             animRef.current = requestAnimationFrame(animate);
-        },
-        [isHovered, totalOriginalWidth]
-    );
+        };
 
-    useEffect(() => {
         animRef.current = requestAnimationFrame(animate);
         return () => {
             if (animRef.current) cancelAnimationFrame(animRef.current);
         };
-    }, [animate]);
+    }, []);
+
+    const handleMouseEnter = () => { isHoveredRef.current = true; };
+    const handleMouseLeave = () => {
+        isHoveredRef.current = false;
+        lastTimeRef.current = null;
+    };
+
+    // Touch support for mobile
+    const touchRef = useRef({ startX: 0, startOffset: 0, isDragging: false });
+
+    const handleTouchStart = (e) => {
+        isHoveredRef.current = true;
+        touchRef.current.startX = e.touches[0].clientX;
+        touchRef.current.startOffset = offsetRef.current;
+        touchRef.current.isDragging = true;
+    };
+
+    const handleTouchMove = (e) => {
+        if (!touchRef.current.isDragging) return;
+        const dx = touchRef.current.startX - e.touches[0].clientX;
+        const { cardWidth, cardGap } = dimsRef.current;
+        const totalOriginalWidth = testimonials.length * (cardWidth + cardGap);
+        let newOffset = touchRef.current.startOffset + dx;
+        if (newOffset < 0) newOffset += totalOriginalWidth;
+        if (newOffset >= totalOriginalWidth) newOffset -= totalOriginalWidth;
+        offsetRef.current = newOffset;
+    };
+
+    const handleTouchEnd = () => {
+        touchRef.current.isDragging = false;
+        isHoveredRef.current = false;
+        lastTimeRef.current = null;
+    };
 
     return (
         <section className="testimonials-section" id="testimonials">
-            {/* White rectangle backdrop — centered, covers header + card area */}
             <div className="testimonials-rectangle" />
 
-            {/* Content layer on top of the rectangle */}
             <div className="testimonials-content">
                 <motion.div
                     className="testimonials-header"
@@ -95,91 +187,40 @@ const TestimonialsSection = () => {
                     <div className="testimonials-title-underline" />
                 </motion.div>
 
-                {/* Full-width carousel — cards slide across entire viewport */}
                 <div
                     className="testimonials-carousel-wrapper"
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => {
-                        setIsHovered(false);
-                        lastTimeRef.current = null;
-                    }}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
                 >
                     <div
                         className="testimonials-track"
                         ref={trackRef}
-                        style={{
-                            transform: `translateX(${-offset}px)`,
-                        }}
                     >
-                        {extendedTestimonials.map((item, index) => {
-                            const containerWidth =
-                                typeof window !== 'undefined' ? window.innerWidth : 1200;
-                            const centerX = containerWidth / 2;
-                            const cardCenter =
-                                index * SLIDE_UNIT + CARD_WIDTH / 2 - offset;
-
-                            // Rectangle boundaries
-                            const rectWidth = Math.min(RECT_MAX_WIDTH, containerWidth * 0.65);
-                            const rectLeft = centerX - rectWidth / 2;
-                            const rectRight = centerX + rectWidth / 2;
-
-                            // How much of the card overlaps with the rectangle
-                            const cardLeft = cardCenter - CARD_WIDTH / 2;
-                            const cardRight = cardCenter + CARD_WIDTH / 2;
-                            const overlapLeft = Math.max(cardLeft, rectLeft);
-                            const overlapRight = Math.min(cardRight, rectRight);
-                            const overlap = Math.max(0, overlapRight - overlapLeft);
-                            const insideRatio = overlap / CARD_WIDTH;
-
-                            const scale = 0.82 + insideRatio * 0.18;
-                            const shadowOpacity = 0.02 + insideRatio * 0.1;
-                            const yShift = (1 - insideRatio) * 8;
-                            const zIndex = Math.round(insideRatio * 10);
-
-                            return (
-                                <div
-                                    key={index}
-                                    className="testimonial-card"
-                                    style={{
-                                        width: CARD_WIDTH,
-                                        minWidth: CARD_WIDTH,
-                                        marginRight: CARD_GAP,
-                                        transform: `scale(${scale}) translateY(${yShift}px)`,
-                                        boxShadow: `0 ${2 + insideRatio * 18}px ${8 + insideRatio * 34}px rgba(0, 0, 0, ${shadowOpacity})`,
-                                        zIndex,
-                                        opacity: 0.45 + insideRatio * 0.55,
-                                    }}
-                                >
-                                    <div className="testimonial-card-inner">
-                                        <div className="testimonial-avatar">
-                                            <span className="testimonial-avatar-initials">
-                                                {item.author
-                                                    .split(' ')
-                                                    .map((n) => n[0])
-                                                    .join('')}
-                                            </span>
-                                        </div>
-
-                                        <h4 className="testimonial-author">
-                                            {item.author}
-                                        </h4>
-                                        <p className="testimonial-role">{item.role}</p>
-
-                                        <div className="testimonial-quote-wrapper">
-                                            <span className="testimonial-quote-mark top-left">
-                                                "
-                                            </span>
-                                            <p className="testimonial-quote-text">
-                                                {item.quote}
-                                            </p>
-                                            <span className="testimonial-quote-mark bottom-right">
-                                                "
-                                            </span>
-                                        </div>
+                        {extendedTestimonials.map((item, index) => (
+                            <div
+                                key={index}
+                                className="testimonial-card"
+                                ref={(el) => { cardRefs.current[index] = el; }}
+                            >
+                                <div className="testimonial-card-inner">
+                                    <div className="testimonial-avatar">
+                                        <span className="testimonial-avatar-initials">
+                                            {item.author.split(' ').map((n) => n[0]).join('')}
+                                        </span>
+                                    </div>
+                                    <h4 className="testimonial-author">{item.author}</h4>
+                                    <p className="testimonial-role">{item.role}</p>
+                                    <div className="testimonial-quote-wrapper">
+                                        <span className="testimonial-quote-mark top-left">"</span>
+                                        <p className="testimonial-quote-text">{item.quote}</p>
+                                        <span className="testimonial-quote-mark bottom-right">"</span>
                                     </div>
                                 </div>
-                            );
-                        })}
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
