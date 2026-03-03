@@ -1,61 +1,128 @@
 import React from 'react';
-import { Github, Twitter, Linkedin, Mail, ArrowUp } from 'lucide-react';
+import { Github, Twitter, Linkedin, Mail, ArrowUp, MapPin, Phone, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    const currentYear = new Date().getFullYear();
+
     return (
-        <footer className="relative pt-16 pb-8" style={{ background: 'linear-gradient(180deg, var(--bg-dark), #edeef1)' }}>
-            <div className="absolute top-0 left-0 w-full h-px bg-primary/[0.06]" />
-
-            <div className="container">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-                    <div className="md:col-span-2">
-                        <h2 className="text-xl font-bold font-header mb-3 text-primary">
-                            AUTONOM<span className="text-accent">IX</span>
-                        </h2>
-                        <p className="text-dim text-sm leading-relaxed max-w-sm">
-                            Building the future of intelligent automation. We empower enterprises with AI agents and autonomous workflows.
-                        </p>
-                    </div>
-
-                    <div>
-                        <h4 className="font-bold text-xs uppercase tracking-[0.15em] text-primary mb-4">Navigation</h4>
-                        <div className="space-y-3">
-                            {['Home', 'Services', 'About', 'Contact'].map((item) => (
-                                <a key={item} href={`/${item === 'Home' ? '' : item.toLowerCase()}`}
-                                    className="block text-dim text-sm hover:text-primary transition-colors duration-300">
-                                    {item}
-                                </a>
-                            ))}
+        <footer className="footer">
+            {/* Top CTA Band */}
+            <div className="footer-cta">
+                <div className="container">
+                    <div className="footer-cta-inner">
+                        <div className="footer-cta-text">
+                            <h3 className="footer-cta-title">Ready to automate?</h3>
+                            <p className="footer-cta-desc">Let's build intelligent solutions for your business.</p>
                         </div>
+                        <Link to="/contact" className="footer-cta-btn">
+                            Get in Touch <ArrowUp size={14} style={{ transform: 'rotate(45deg)' }} />
+                        </Link>
                     </div>
+                </div>
+            </div>
 
-                    <div>
-                        <h4 className="font-bold text-xs uppercase tracking-[0.15em] text-primary mb-4">Connect</h4>
-                        <div className="flex gap-2">
-                            {[Twitter, Linkedin, Github, Mail].map((Icon, i) => (
-                                <a key={i} href="#"
-                                    className="w-9 h-9 rounded-xl flex items-center justify-center text-dim bg-primary/[0.04] hover:bg-primary/[0.08] hover:text-primary transition-all duration-300">
-                                    <Icon size={16} />
-                                </a>
-                            ))}
+            {/* Main Footer Content */}
+            <div className="footer-main">
+                <div className="container">
+                    <div className="footer-grid">
+                        {/* Brand Column */}
+                        <div className="footer-brand">
+                            <h2 className="footer-logo">
+                                AUTONOM<span className="footer-logo-accent">IX</span>
+                            </h2>
+                            <p className="footer-brand-desc">
+                                Building the future of intelligent automation. We empower enterprises with AI agents and autonomous workflows.
+                            </p>
+                            <div className="footer-social">
+                                {[
+                                    { Icon: Twitter, label: 'Twitter', href: '#' },
+                                    { Icon: Linkedin, label: 'LinkedIn', href: '#' },
+                                    { Icon: Github, label: 'GitHub', href: '#' },
+                                    { Icon: Mail, label: 'Email', href: 'mailto:hello@autonomix.ly' },
+                                ].map(({ Icon, label, href }) => (
+                                    <a key={label} href={href} className="footer-social-link" aria-label={label}>
+                                        <Icon size={16} />
+                                    </a>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Navigation */}
+                        <div className="footer-col">
+                            <h4 className="footer-col-title">Navigation</h4>
+                            <ul className="footer-links">
+                                {[
+                                    { name: 'Home', path: '/' },
+                                    { name: 'Services', path: '/services' },
+                                    { name: 'About', path: '/about' },
+                                    { name: 'Contact', path: '/contact' },
+                                ].map((item) => (
+                                    <li key={item.name}>
+                                        <Link to={item.path} className="footer-link">{item.name}</Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* Services */}
+                        <div className="footer-col">
+                            <h4 className="footer-col-title">Services</h4>
+                            <ul className="footer-links">
+                                {[
+                                    'AI Workflow Automation',
+                                    'Custom AI Agents',
+                                    'Enterprise Solutions',
+                                    'Consulting',
+                                ].map((item) => (
+                                    <li key={item}>
+                                        <Link to="/services" className="footer-link">{item}</Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* Contact */}
+                        <div className="footer-col">
+                            <h4 className="footer-col-title">Contact</h4>
+                            <ul className="footer-contact-list">
+                                <li className="footer-contact-item">
+                                    <Mail size={14} />
+                                    <span>hello@autonomix.ly</span>
+                                </li>
+                                <li className="footer-contact-item">
+                                    <Phone size={14} />
+                                    <span>+218 91 000 0000</span>
+                                </li>
+                                <li className="footer-contact-item">
+                                    <MapPin size={14} />
+                                    <span>Tripoli, Libya</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-primary/[0.06]">
-                    <p className="text-dim text-xs mb-4 md:mb-0">
-                        &copy; {new Date().getFullYear()} Autonomix. All rights reserved.
-                    </p>
-                    <button
-                        onClick={scrollToTop}
-                        className="w-9 h-9 rounded-full flex items-center justify-center text-dim bg-primary/[0.04] hover:bg-primary/[0.08] hover:text-primary transition-all duration-300"
-                    >
-                        <ArrowUp size={16} />
-                    </button>
+            {/* Bottom Bar */}
+            <div className="footer-bottom">
+                <div className="container">
+                    <div className="footer-bottom-inner">
+                        <p className="footer-copyright">
+                            &copy; {currentYear} Autonomix. All rights reserved.
+                        </p>
+                        <div className="footer-bottom-links">
+                            <a href="#" className="footer-bottom-link">Privacy Policy</a>
+                            <a href="#" className="footer-bottom-link">Terms of Service</a>
+                        </div>
+                        <button onClick={scrollToTop} className="footer-top-btn" aria-label="Back to top">
+                            <ArrowUp size={16} />
+                        </button>
+                    </div>
                 </div>
             </div>
         </footer>
