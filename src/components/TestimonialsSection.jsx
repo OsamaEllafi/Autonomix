@@ -29,7 +29,7 @@ const testimonials = [
     },
 ];
 
-const RECT_MAX_WIDTH = 820;
+const RECT_MAX_WIDTH = 880;
 
 const TestimonialsSection = () => {
     const trackRef = useRef(null);
@@ -38,7 +38,7 @@ const TestimonialsSection = () => {
     const animRef = useRef(null);
     const lastTimeRef = useRef(null);
     const isHoveredRef = useRef(false);
-    const dimsRef = useRef({ cardWidth: 240, cardGap: 20, speed: 3000 });
+    const dimsRef = useRef({ cardWidth: 280, cardGap: 24, speed: 3000 });
 
     // Triple the list for seamless looping
     const extendedTestimonials = [...testimonials, ...testimonials, ...testimonials];
@@ -48,11 +48,11 @@ const TestimonialsSection = () => {
         const updateDims = () => {
             const w = window.innerWidth;
             if (w <= 480) {
-                dimsRef.current = { cardWidth: 180, cardGap: 14, speed: 4000 };
+                dimsRef.current = { cardWidth: 220, cardGap: 16, speed: 4000 };
             } else if (w <= 768) {
-                dimsRef.current = { cardWidth: 200, cardGap: 16, speed: 3500 };
+                dimsRef.current = { cardWidth: 240, cardGap: 20, speed: 3500 };
             } else {
-                dimsRef.current = { cardWidth: 240, cardGap: 20, speed: 3000 };
+                dimsRef.current = { cardWidth: 280, cardGap: 24, speed: 3000 };
             }
             // Update card widths directly
             cardRefs.current.forEach((el) => {
@@ -96,7 +96,7 @@ const TestimonialsSection = () => {
             // Update each card's style directly
             const vw = window.innerWidth;
             const centerX = vw / 2;
-            const rectWidth = Math.min(RECT_MAX_WIDTH, vw * 0.65);
+            const rectWidth = Math.min(RECT_MAX_WIDTH, vw * 0.7);
             const rectLeft = centerX - rectWidth / 2;
             const rectRight = centerX + rectWidth / 2;
 
@@ -113,17 +113,29 @@ const TestimonialsSection = () => {
                 const overlap = overlapRight - overlapLeft;
                 const t = overlap > 0 ? overlap / cardWidth : 0;
 
-                const scale = 0.82 + t * 0.18;
-                const yShift = (1 - t) * 8;
-                const opacity = 0.45 + t * 0.55;
-                const shadowY = 2 + t * 18;
-                const shadowBlur = 8 + t * 34;
-                const shadowAlpha = 0.02 + t * 0.1;
+                // Physics values tailored for glassmorphism pop
+                const scale = 0.85 + t * 0.15;
+                const yShift = (1 - t) * 12;
+                const opacity = 0.3 + t * 0.7;
+
+                // Deep ambient shadow physics
+                const shadowY = 4 + t * 20;
+                const shadowBlur = 12 + t * 40;
+                const shadowAlpha = 0.03 + t * 0.07;
 
                 el.style.transform = `scale(${scale}) translateY(${yShift}px)`;
                 el.style.opacity = opacity;
                 el.style.boxShadow = `0 ${shadowY}px ${shadowBlur}px rgba(0,0,0,${shadowAlpha})`;
                 el.style.zIndex = Math.round(t * 10);
+
+                // Toggle glass border visibility based on focus
+                if (t > 0.8) {
+                    el.style.borderColor = 'rgba(0,0,0,0.05)';
+                    el.style.backgroundColor = 'rgba(255,255,255,0.95)';
+                } else {
+                    el.style.borderColor = 'transparent';
+                    el.style.backgroundColor = 'rgba(255,255,255,0.5)';
+                }
             }
 
             animRef.current = requestAnimationFrame(animate);
@@ -169,55 +181,74 @@ const TestimonialsSection = () => {
     };
 
     return (
-        <section className="testimonials-section" id="testimonials">
-            <div className="testimonials-rectangle" />
+        <section className="relative w-full py-32 overflow-hidden bg-white/50" id="testimonials">
 
-            <div className="testimonials-content">
+            {/* The structural massive background rectangle for cards to interact with */}
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[880px] h-[360px] md:h-[400px] bg-white rounded-[48px] border border-black/[0.03] shadow-[0_40px_100px_rgba(0,0,0,0.02)] hidden md:block z-0" />
+
+            <div className="relative z-10 w-full">
+
+                {/* Header Section */}
                 <motion.div
-                    className="testimonials-header"
+                    className="flex flex-col items-center justify-center text-center px-4 mb-20 relative"
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
+                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                     viewport={{ once: true }}
                 >
-                    <div className="testimonials-quote-bg">"</div>
-                    <h2 className="testimonials-title">
-                        What our Clients say!
+                    {/* Massive background quotes */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[180px] md:text-[240px] font-serif italic text-black/[0.02] select-none pointer-events-none -z-10 tracking-tighter leading-none mt-10">
+                        "
+                    </div>
+
+                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-header font-bold text-primary tracking-tight">
+                        Client Matrix
                     </h2>
-                    <div className="testimonials-title-underline" />
+                    <div className="w-12 h-1 bg-primary/20 mt-6 rounded-full" />
                 </motion.div>
 
+                {/* Infinite Carousel Track */}
                 <div
-                    className="testimonials-carousel-wrapper"
+                    className="w-full relative py-10 overflow-hidden"
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                     onTouchStart={handleTouchStart}
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
+                    style={{ touchAction: 'pan-y' }}
                 >
                     <div
-                        className="testimonials-track"
+                        className="flex will-change-transform"
                         ref={trackRef}
                     >
                         {extendedTestimonials.map((item, index) => (
                             <div
                                 key={index}
-                                className="testimonial-card"
+                                className="shrink-0 transition-transform duration-300 ease-out p-2"
                                 ref={(el) => { cardRefs.current[index] = el; }}
                             >
-                                <div className="testimonial-card-inner">
-                                    <div className="testimonial-avatar">
-                                        <span className="testimonial-avatar-initials">
+                                <div className="h-full w-full rounded-[32px] p-8 md:p-10 flex flex-col justify-between items-center text-center relative overflow-hidden backdrop-blur-xl border border-transparent transition-colors duration-300">
+
+                                    {/* Small aesthetic quotes */}
+                                    <div className="absolute top-6 left-6 text-6xl font-serif italic text-primary/[0.04] leading-none pointer-events-none select-none">"</div>
+                                    <div className="absolute bottom-6 right-6 text-6xl font-serif italic text-primary/[0.04] leading-none pointer-events-none select-none">"</div>
+
+                                    {/* Author Info */}
+                                    <div className="mb-8 flex flex-col items-center">
+                                        <div className="w-16 h-16 rounded-full bg-[#050505] text-white flex items-center justify-center font-header font-bold tracking-widest text-lg mb-4 shadow-lg shadow-black/10">
                                             {item.author.split(' ').map((n) => n[0]).join('')}
-                                        </span>
+                                        </div>
+                                        <h4 className="font-header font-bold text-primary text-xl tracking-wide">{item.author}</h4>
+                                        <p className="text-[10px] uppercase font-header tracking-[0.2em] text-primary/40 mt-1">{item.role}</p>
                                     </div>
-                                    <h4 className="testimonial-author">{item.author}</h4>
-                                    <p className="testimonial-role">{item.role}</p>
-                                    <div className="testimonial-quote-wrapper">
-                                        <span className="testimonial-quote-mark top-left">"</span>
-                                        <p className="testimonial-quote-text">{item.quote}</p>
-                                        <span className="testimonial-quote-mark bottom-right">"</span>
+
+                                    {/* Quote */}
+                                    <div className="relative z-10">
+                                        <p className="font-light italic text-primary/70 leading-relaxed text-sm md:text-base px-2">
+                                            {item.quote}
+                                        </p>
                                     </div>
+
                                 </div>
                             </div>
                         ))}
