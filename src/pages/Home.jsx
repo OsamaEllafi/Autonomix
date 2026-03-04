@@ -86,38 +86,91 @@ const Home = () => {
             <FeaturesSection />
             <ProcessSection />
 
-            {/* Services Preview */}
-            <section className="py-24">
-                <div className="container">
+            {/* Services Preview — Avant-Garde Bento Box */}
+            <section className="py-32 relative overflow-hidden bg-white">
+                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/[0.02] rounded-full blur-[120px] pointer-events-none" />
+
+                <div className="container relative z-10 max-w-6xl">
                     <motion.div
-                        className="text-center mb-16"
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                        viewport={{ once: true }}
+                        className="text-center mb-20"
+                        initial={{ opacity: 0, y: 30, filter: 'blur(8px)' }}
+                        whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                        viewport={{ once: true, margin: "-100px" }}
                     >
-                        <h2 className="text-3xl md:text-4xl font-header font-bold mb-4 text-primary">
-                            Our Services
+                        <h2 className="text-4xl md:text-5xl font-header font-bold mb-6 text-primary tracking-wide">
+                            OUR SERVICES
                         </h2>
                         <div className="section-accent-line" />
+                        <p className="text-dim max-w-xl mx-auto text-lg leading-relaxed">
+                            Cutting-edge AI blueprints engineered for massive scale and flawless precision.
+                        </p>
                     </motion.div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {['AI Workflow Automation', 'Custom AI Agents', 'Enterprise Solutions'].map((title, i) => (
+
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8">
+                        {/* Featured Service (Spans 8 cols) */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 40, filter: 'blur(10px)' }}
+                            whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+                            viewport={{ once: true, margin: "-100px" }}
+                            className="md:col-span-8 group perspective-1000"
+                        >
                             <motion.div
-                                key={i}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay: i * 0.1 }}
-                                viewport={{ once: true }}
-                                className="glass p-8 rounded-2xl hover:-translate-y-1 transition-all duration-400 group"
+                                animate={{ y: [0, -8, 0] }}
+                                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 0 }}
+                                className="glass-premium h-full p-10 lg:p-14 rounded-[32px] ambient-shadow relative overflow-hidden flex flex-col justify-between"
                             >
-                                <div className="w-12 h-12 rounded-xl mb-5 flex items-center justify-center bg-primary/[0.06] text-primary/70 font-bold text-sm font-header group-hover:bg-primary/[0.1] transition-colors">
+                                <div className="absolute top-0 right-0 p-8 text-primary/[0.03] font-header text-8xl font-bold select-none pointer-events-none">01</div>
+
+                                <div className="w-16 h-16 rounded-2xl mb-8 flex items-center justify-center bg-primary/[0.04] text-primary/70 font-bold text-lg font-header border border-primary/[0.05] transition-transform duration-700 group-hover:scale-110">
                                     AI
                                 </div>
-                                <h3 className="text-lg font-bold mb-3 text-primary">{title}</h3>
-                                <p className="text-dim text-sm leading-relaxed">Streamline your business processes with our cutting-edge AI solutions.</p>
+                                <div>
+                                    <h3 className="text-3xl lg:text-4xl font-bold mb-4 text-primary font-header tracking-wide">AI Workflow Automation</h3>
+                                    <p className="text-dim text-lg leading-relaxed max-w-md">Streamline your entire business topology. We identify bottlenecks and deploy autonomous micro-agents to resolve them instantly.</p>
+                                </div>
                             </motion.div>
-                        ))}
+                        </motion.div>
+
+                        {/* Stacked Side Services (Spans 4 cols) */}
+                        <div className="md:col-span-4 flex flex-col gap-6 lg:gap-8">
+                            <motion.div
+                                initial={{ opacity: 0, x: 40, filter: 'blur(10px)' }}
+                                whileInView={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+                                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+                                viewport={{ once: true, margin: "-100px" }}
+                                className="h-full group"
+                            >
+                                <motion.div
+                                    animate={{ y: [0, -6, 0] }}
+                                    transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                                    className="glass-premium p-8 rounded-[28px] h-full relative overflow-hidden"
+                                >
+                                    <h4 className="text-xs font-header tracking-[0.2em] text-accent mb-4 uppercase">Node 02</h4>
+                                    <h3 className="text-xl font-bold mb-3 text-primary tracking-wide">Custom AI Agents</h3>
+                                    <p className="text-dim text-sm leading-relaxed">Bespoke LLM-powered entities trained securely on your proprietary data schemas.</p>
+                                </motion.div>
+                            </motion.div>
+
+                            <motion.div
+                                initial={{ opacity: 0, x: 40, filter: 'blur(10px)' }}
+                                whileInView={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+                                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+                                viewport={{ once: true, margin: "-100px" }}
+                                className="h-full group"
+                            >
+                                <motion.div
+                                    animate={{ y: [0, -10, 0] }}
+                                    transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                                    className="bg-primary p-8 rounded-[28px] h-full relative overflow-hidden"
+                                >
+                                    <h4 className="text-xs font-header tracking-[0.2em] text-white/40 mb-4 uppercase">Node 03</h4>
+                                    <h3 className="text-xl font-bold mb-3 text-white tracking-wide">Enterprise Solutions</h3>
+                                    <p className="text-white/60 text-sm leading-relaxed">Full-stack infrastructure transformation. From raw data lakes to autonomous decision matrices.</p>
+                                </motion.div>
+                            </motion.div>
+                        </div>
                     </div>
                 </div>
             </section>
