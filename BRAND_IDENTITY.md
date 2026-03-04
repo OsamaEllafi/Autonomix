@@ -95,7 +95,15 @@
   - Effects: `backdrop-filter: blur(16px)`, `box-shadow: 0 2px 20px rgba(0, 0, 0, 0.04)`
   - Hover: Increased shadow, slightly darker border
   - Transition: `0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)`
-  - Usage: Service cards, testimonial cards, contact info panels, form containers.
+  - Usage: Contact info panels, form containers, general-purpose cards.
+
+- **Premium Glassmorphism (`.glass-premium` / inline Tailwind)**
+  - Background: Dynamic — `rgba(255,255,255,0.5)` at rest, `rgba(255,255,255,0.95)` on focus/center
+  - Border: `border border-transparent`, transitions to `rgba(0,0,0,0.05)` on focus
+  - Effects: `backdrop-blur-xl`, deep ambient `box-shadow` (up to `0 24px 52px rgba(0,0,0,0.1)`)
+  - Shape: Large rounded corners (`rounded-[32px]` to `rounded-[48px]`)
+  - Usage: Services bento cards, Client Matrix testimonial cards
+  - Philosophy: Cards feel like frosted panels of glass floating above a surface, with depth controlled by shadow physics.
 
 - **Section Divider (`.section-accent-line`)**
   - Width: `48px`, Height: `3px`
@@ -141,14 +149,39 @@
 
 ---
 
-## Footer
+## Footer (Ultra-Minimal Single Row)
 
-- Background: Gradient from `var(--bg-dark)` to `#edeef1`
-- Top separator: `1px` line in `primary/[0.06]`
-- Layout: 4-column grid (brand spanning 2, navigation, social connect)
-- Social icons: Monochrome, `bg-primary/[0.04]`, hover → `bg-primary/[0.08]`
-- Back-to-top: Rounded button with same styling as social icons
-- Bottom bar: Copyright text + back-to-top, separated by `border-t`
+- **Background**: `bg-black/40` overlay on the `footer-avant-garde` dark base, with a subtle `border-t border-white/[0.02]` top separator.
+- **Layout**: Strict **CSS Grid** — `grid-cols-1 lg:grid-cols-3` — ensuring a perfectly balanced single horizontal row on desktop:
+  - **Left column**: Brand wordmark (`AUTONOMIX` in `text-3xl font-header`) + copyright text (`text-xs text-white/30`).
+  - **Center column**: Navigation links (`Terminal`, `Capabilities`, `Manifesto`, `Comms`) in `text-sm font-header tracking-[0.2em] uppercase text-white/40`.
+  - **Right column**: Social icons (Twitter, LinkedIn, Github at `size={18}`, `text-white/30 hover:text-white`) + back-to-top `ArrowUp` button.
+- **Vertical padding**: `py-10 lg:py-12` — generous but compact; the footer is intentionally short.
+- **Design intent**: The footer is a sleek, ultra-minimal information bar. No decorative animations, no circles, no multi-row layouts. Pure function and form.
+- **Typography**: All text uses `font-header` (Orbitron) with wide tracking for consistency with the brand's techno-geometric identity.
+
+---
+
+## Services Page (Bento Grid)
+
+- **Layout**: 3-column responsive grid (`grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8`).
+- **Cards**: `.glass-premium` panels with floating physics animations (`@keyframes floatPhysics`).
+- **Watermark numbers**: Large, faint index numbers (`text-[120px] text-primary/[0.015]`) positioned behind each card for editorial depth.
+- **Design intent**: Compact, high-fashion editorial grid. No excessive spacing or staggered layouts.
+
+---
+
+## Client Matrix (Testimonials Section)
+
+- **Layout**: Full-width horizontal infinite carousel with physics-based scrolling (`requestAnimationFrame`).
+- **Background element**: A massive white rounded rectangle (`max-w-[880px] h-[400px] rounded-[48px]`) centered behind the carousel.
+- **Card behavior**: Cards dynamically scale, shift vertically, and change opacity/shadow as they scroll through the center focus zone.
+  - Center focus: `scale(1.0)`, `opacity(1.0)`, `rgba(255,255,255,0.95)`, deep shadow.
+  - Edge/offscreen: `scale(0.85)`, `opacity(0.3)`, `rgba(255,255,255,0.5)`, minimal shadow.
+- **Typography**: Author names in `font-header font-bold`, roles in `text-[10px] uppercase tracking-[0.2em]`, quotes in `font-light italic`.
+- **Avatars**: Dark circles (`bg-[#050505]`) with white initials, `shadow-lg shadow-black/10`.
+- **Ambient watermarks**: Giant faint quote marks (`text-[240px] text-black/[0.02]`) behind the header.
+- **Touch support**: Full swipe-to-scroll on mobile with `touchAction: 'pan-y'`.
 
 ---
 
@@ -158,7 +191,10 @@
 - Prefer **`primary` charcoal** for interactive elements (buttons, active links, headings) and **`dim` gray** for supporting text.
 - Keep backgrounds in **`--bg-dark` off-white** to maintain a clean, professional appearance.
 - Use **`Orbitron`** for anything structural (logo, headings, CTAs, step numbers) and **`Inter`** for readable body copy.
-- Use `.glass` cards **sparingly** to highlight key content sections.
+- Use `.glass` cards for general containers and `.glass-premium` (or equivalent Tailwind inline) for hero-level feature cards.
 - All card hover states should be **subtle** — slight lift (`-1px`), increased shadow, slightly darker border.
 - Hero text should always stay at the **bottom of the viewport** to keep the 3D scene visible and unobstructed.
 - The floating island navbar should remain **compact** and centered — it should never span the full page width.
+- The **footer must remain a single horizontal row** on desktop — never multi-column or multi-row. It is a minimal information bar.
+- **Animations should feel physical**, not decorative — use `requestAnimationFrame` for scroll-linked effects and `cubic-bezier` easing for transitions.
+- **Avoid circles and rings** as decorative elements — prefer clean lines, frosted glass, and negative space.
