@@ -68,17 +68,6 @@ const Navbar = () => {
                     >
                         AUTONOM<span className="text-accent">IX</span>
                     </Link>
-                    
-                    {/* Pulsing System Status Tag */}
-                    <Link 
-                        to="/security" 
-                        onClick={playClick}
-                        onMouseEnter={playHover}
-                        className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-emerald-500/[0.05] border border-emerald-500/10 rounded-full text-[8px] font-header font-bold text-emerald-600 tracking-wider hover:bg-emerald-500/10 transition-colors uppercase select-none"
-                    >
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        Nominal
-                    </Link>
                 </div>
 
                 {/* Desktop Menu */}
