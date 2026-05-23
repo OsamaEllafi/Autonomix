@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Terminal as TermIcon, Shield, Server, Cpu, Play } from 'lucide-react';
 import { useAudio } from '../hooks/useAudio';
+import { useSEO } from '../hooks/useSEO';
 
 const Terminal = () => {
+    useSEO('Active System Terminal Node', 'Execute command-line operations, inspect node statuses, and compile agent blueprints.');
     const [input, setInput] = useState('');
     const [history, setHistory] = useState([
         { type: 'system', text: 'AUTONOMIX TERMINAL v1.0.4 - ONLINE' },

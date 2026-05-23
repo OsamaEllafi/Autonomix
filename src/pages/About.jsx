@@ -1,8 +1,53 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Cpu, Zap, Layers, ShieldAlert, CircleDot, Activity } from 'lucide-react';
 import TiltCard from '../components/TiltCard';
+import { useAudio } from '../hooks/useAudio';
+import { useSEO } from '../hooks/useSEO';
+
+const versions = [
+    {
+        tag: 'v1.0',
+        name: 'Genesis Engine',
+        date: 'Q1 2024',
+        latency: '140ms',
+        load: '15%',
+        description: 'First-generation cognitive routing architecture. Established basic distributed worker queues and sequential task scheduling.',
+        features: ['Cognitive API Router', 'Sequential Task Queues', 'Structured JSON Ingestion'],
+        status: 'Deprecated'
+    },
+    {
+        tag: 'v2.0',
+        name: 'Vector Mesh',
+        date: 'Q3 2024',
+        latency: '45ms',
+        load: '40%',
+        description: 'Second-generation semantic coordination. Integrated high-throughput embedding synchronizers and hot-swap vector pools.',
+        features: ['Semantic Embedding Sync', 'Hot-Swap Vector Pools', 'Multi-Agent Broker Node'],
+        status: 'Deprecated'
+    },
+    {
+        tag: 'v3.0',
+        name: 'Autonomous Fabric',
+        date: 'Active',
+        latency: '12ms',
+        load: '88%',
+        description: 'Current production protocol. Powered by recursive reasoning clusters, real-time SVG routing, and self-healing micro-agent states.',
+        features: ['Recursive Reasoning Mesh', 'SVG Real-time Packet Routing', 'Self-Healing Core Fabric'],
+        status: 'Active'
+    }
+];
 
 const About = () => {
+    useSEO('Manifesto & Mission Control', 'Founded at the exact intersection of software systems and artificial intelligence. Read the Autonomix manifesto.');
+    const { playClick, playHover } = useAudio();
+    const [selectedIdx, setSelectedIdx] = useState(2); // default to v3.0
+
+    const handleVersionClick = (idx) => {
+        playClick();
+        setSelectedIdx(idx);
+    };
+
     return (
         <div className="pt-32 pb-32 min-h-screen bg-white relative overflow-hidden" style={{ zIndex: 10 }}>
             {/* Ambient Background Glows */}
@@ -28,7 +73,7 @@ const About = () => {
                 </div>
 
                 {/* Content Split: Asymmetrical Editorial Columns */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-start mb-32">
 
                     {/* Left Column: Mission Control Visual */}
                     <div className="lg:col-span-5 relative perspective-1000">
@@ -99,6 +144,118 @@ const About = () => {
                     </div>
 
                 </div>
+
+                {/* Section 2: Interactive Protocol Evolution Timeline */}
+                <div className="border-t border-primary/10 pt-32 max-w-6xl mx-auto">
+                    <div className="text-center mb-20">
+                        <h2 className="text-3xl font-header font-bold text-primary tracking-wide mb-6">PROTOCOL EVOLUTION</h2>
+                        <div className="section-accent-line" />
+                        <p className="text-dim text-base max-w-md mx-auto leading-relaxed">
+                            Chronology of simulated cognitive architectures. Click nodes to review previous deployments.
+                        </p>
+                    </div>
+
+                    {/* Timeline Tracker Chassis */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                        
+                        {/* Selector Column (5 cols) */}
+                        <div className="lg:col-span-5 flex flex-col gap-6 relative z-10">
+                            {versions.map((ver, idx) => (
+                                <button
+                                    key={ver.tag}
+                                    onClick={() => handleVersionClick(idx)}
+                                    onMouseEnter={playHover}
+                                    className={`w-full text-left p-6 rounded-2xl border transition-all flex items-center justify-between cursor-pointer ${
+                                        selectedIdx === idx
+                                            ? 'bg-primary text-white border-primary shadow-xl shadow-primary/10 scale-[1.02]'
+                                            : 'bg-white text-primary border-black/[0.05] hover:bg-black/[0.02]'
+                                    }`}
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <span className={`font-header font-bold text-xs tracking-wider px-2.5 py-1 rounded-md ${
+                                            selectedIdx === idx 
+                                                ? 'bg-white/10 text-white' 
+                                                : 'bg-primary/[0.04] text-primary'
+                                        }`}>
+                                            {ver.tag}
+                                        </span>
+                                        <div>
+                                            <h4 className="font-header font-bold text-sm tracking-wide">{ver.name}</h4>
+                                            <span className={`text-[9px] uppercase tracking-widest font-mono ${
+                                                selectedIdx === idx ? 'text-white/55' : 'text-dim'
+                                            }`}>
+                                                {ver.date}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <CircleDot size={16} className={selectedIdx === idx ? 'text-emerald-400' : 'text-primary/20'} />
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Interactive Viewer Column (7 cols) */}
+                        <div className="lg:col-span-7 h-[360px] flex items-center justify-center">
+                            <AnimatePresence mode="wait">
+                                {versions.map((ver, idx) => {
+                                    if (selectedIdx !== idx) return null;
+                                    return (
+                                        <motion.div
+                                            key={ver.tag + '-detail'}
+                                            initial={{ opacity: 0, x: 20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: -20 }}
+                                            transition={{ duration: 0.35, ease: 'easeOut' }}
+                                            className="w-full h-full glass-premium rounded-[32px] p-8 md:p-10 border border-white flex flex-col justify-between"
+                                        >
+                                            <div>
+                                                <div className="flex items-center justify-between mb-6 border-b border-black/[0.03] pb-4">
+                                                    <h3 className="font-header font-bold text-lg text-primary tracking-wide">{ver.name} Specs</h3>
+                                                    <span className={`text-[8px] font-header font-bold px-2 py-0.5 rounded uppercase tracking-widest ${
+                                                        ver.status === 'Active' ? 'bg-emerald-500/10 text-emerald-600 animate-pulse' : 'bg-red-500/10 text-red-500'
+                                                    }`}>
+                                                        {ver.status}
+                                                    </span>
+                                                </div>
+                                                <p className="text-dim text-sm leading-relaxed mb-6 font-light">{ver.description}</p>
+                                                
+                                                {/* Features list */}
+                                                <div className="space-y-2">
+                                                    <span className="text-[9px] font-header tracking-wider uppercase text-primary/40 block mb-3">Core Modules</span>
+                                                    {ver.features.map((feat, fidx) => (
+                                                        <div key={fidx} className="flex items-center gap-2 text-xs text-primary font-medium">
+                                                            <span className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                                                            {feat}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            {/* Diagnostic Specs Footer */}
+                                            <div className="grid grid-cols-2 gap-4 border-t border-black/[0.03] pt-6 mt-6">
+                                                <div>
+                                                    <span className="text-[9px] text-dim uppercase block font-header">Operational Latency</span>
+                                                    <span className="font-mono text-base font-bold text-primary flex items-center gap-1.5 mt-1">
+                                                        <Zap size={14} className="text-amber-500" />
+                                                        {ver.latency}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span className="text-[9px] text-dim uppercase block font-header">Cognitive Thread Load</span>
+                                                    <span className="font-mono text-base font-bold text-primary flex items-center gap-1.5 mt-1">
+                                                        <Cpu size={14} className="text-sky-500" />
+                                                        {ver.load}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    );
+                                })}
+                            </AnimatePresence>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
         </div>
     );

@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Send, MapPin, Phone, Mail, ArrowRight, ShieldCheck, RefreshCw, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAudio } from '../hooks/useAudio';
+import { useSEO } from '../hooks/useSEO';
 
 const Contact = () => {
+    useSEO('Initiate Contact Link', 'Establish secure data link with Autonomix system architects to configure custom automation nodes.');
     const { playClick, playKey, playUplink } = useAudio();
     const [form, setForm] = useState({ firstName: '', lastName: '', email: '', message: '' });
-    const [status, setStatus] = useState('idle'); // idle, transmitting, success
+    const [status, setStatus] = useState('idle'); // idle, transmitting, success, error
     const [uplinkLogs, setUplinkLogs] = useState([]);
 
     const handleInputChange = (field, value) => {
@@ -15,9 +17,41 @@ const Contact = () => {
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-        if (!form.email || !form.message) {
+
+        const emailVal = form.email.trim();
+        const messageVal = form.message.trim();
+
+        // High-fidelity validation check
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const errors = [];
+        if (!emailRegex.test(emailVal)) {
+            errors.push('WARN: Invalid transmission vector format (email).');
+        }
+        if (messageVal.length < 5) {
+            errors.push('WARN: Payload density insufficient (Message < 5 chars).');
+        }
+
+        if (errors.length > 0) {
             playClick();
-            alert("Mandatory vector parameters missing: Email & Payload are required.");
+            setStatus('transmitting');
+            setUplinkLogs([]);
+
+            await new Promise(r => setTimeout(r, 400));
+            setUplinkLogs(prev => [...prev, 'SYS: ANALYZING TRANSACTION ENVELOPE...']);
+            playKey();
+
+            for (let i = 0; i < errors.length; i++) {
+                await new Promise(r => setTimeout(r, 600));
+                setUplinkLogs(prev => [...prev, errors[i]]);
+                playKey();
+            }
+
+            await new Promise(r => setTimeout(r, 500));
+            setUplinkLogs(prev => [...prev, 'ABORT: UPLINK VECTOR DISRUPTED. REJECTED.']);
+            playUplink(); // warn chime
+
+            await new Promise(r => setTimeout(r, 800));
+            setStatus('error');
             return;
         }
 
@@ -177,7 +211,7 @@ const Contact = () => {
                                         </div>
 
                                         <div className="space-y-3 relative group">
-                                            <label className="text-[10px] uppercase tracking-[0.2em] text-primary/60 font-bold block transition-colors group-focus-within:text-primary">Data Payload (Message) *</label>
+                                            <label className="text-[10px] uppercase tracking-[0.2em] text-primary/60 font-bold block transition-colors group-focus-within:text-primary">Data Payload (Message) * (Min 5 chars)</label>
                                             <textarea 
                                                 rows="4"
                                                 required
@@ -216,12 +250,14 @@ const Contact = () => {
                                             {uplinkLogs.map((log, index) => (
                                                 <div 
                                                     key={index}
-                                                    className={log.includes('SUCCESS') ? 'text-emerald-400 font-bold' : ''}
+                                                    className={log.includes('SUCCESS') ? 'text-emerald-400 font-bold' : log.includes('WARN') || log.includes('ABORT') ? 'text-red-400 font-bold' : ''}
                                                 >
                                                     &gt; {log}
                                                 </div>
                                             ))}
-                                            <span className="animate-pulse text-white/30">&gt; BROADCASTING PACKETS</span>
+                                            {!uplinkLogs.some(log => log.includes('ABORT')) && (
+                                                <span className="animate-pulse text-white/30">&gt; BROADCASTING PACKETS</span>
+                                            )}
                                         </div>
                                     </motion.div>
                                 )}
@@ -250,6 +286,34 @@ const Contact = () => {
                                         >
                                             <RefreshCw size={13} />
                                             New Transmission
+                                        </button>
+                                    </motion.div>
+                                )}
+
+                                {status === 'error' && (
+                                    <motion.div
+                                        key="form-error"
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.4, ease: 'easeOut' }}
+                                        className="text-center space-y-8 z-10"
+                                    >
+                                        <div className="w-20 h-20 mx-auto bg-red-500/10 text-red-600 rounded-full flex items-center justify-center shadow-inner shadow-red-500/10">
+                                            <AlertCircle size={36} className="animate-pulse" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-2xl font-bold font-header tracking-wide text-red-600 mb-2">TRANSMISSION REJECTED</h3>
+                                            <p className="text-dim text-sm max-w-sm mx-auto leading-relaxed">
+                                                The cognitive router flagged verification errors. Please check the integrity of your identification credentials and operational data.
+                                            </p>
+                                        </div>
+                                        <button 
+                                            onClick={() => setStatus('idle')}
+                                            className="inline-flex items-center gap-2 border border-red-500/20 hover:bg-red-500/[0.04] text-red-600 px-6 py-3.5 rounded-full font-header text-xs tracking-widest uppercase transition-all cursor-pointer"
+                                        >
+                                            <RefreshCw size={13} />
+                                            Re-initialize Form
                                         </button>
                                     </motion.div>
                                 )}

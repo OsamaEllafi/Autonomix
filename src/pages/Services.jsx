@@ -3,6 +3,7 @@ import { Bot, Code, Workflow, Smartphone, Database, Brain, X, Sliders, Cpu, Acti
 import { motion, AnimatePresence } from 'framer-motion';
 import TiltCard from '../components/TiltCard';
 import { useAudio } from '../hooks/useAudio';
+import { useSEO } from '../hooks/useSEO';
 
 const services = [
     { 
@@ -86,6 +87,7 @@ const services = [
 ];
 
 const Services = () => {
+    useSEO('Infrastructure Blueprints', 'Explore custom enterprise automation, autonomous reasoning agents, and zero-trust vector infrastructure.');
     const { playClick, playHover, playKey } = useAudio();
     const [selectedService, setSelectedService] = useState(null);
     const [config, setConfig] = useState({ concurrency: 100, buffer: 16 });

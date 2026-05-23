@@ -7,10 +7,12 @@ import ProcessSection from '../components/ProcessSection';
 import TopologySection from '../components/TopologySection';
 import TestimonialsSection from '../components/TestimonialsSection';
 import TiltCard from '../components/TiltCard';
+import { useSEO } from '../hooks/useSEO';
 
 const Spline = lazy(() => import('@splinetool/react-spline'));
 
 const Home = () => {
+    useSEO('Home', 'Autonomous workflows and intelligent AI agents engineered for enterprise scale and zero trust security.');
     return (
         <div className="relative" style={{ zIndex: 10 }}>
             {/* Hero Section */}
