@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Terminal as TermIcon, Shield, Server, Cpu, Play } from 'lucide-react';
+import { useAudio } from '../hooks/useAudio';
 
 const Terminal = () => {
     const [input, setInput] = useState('');
@@ -12,6 +13,8 @@ const Terminal = () => {
     const [isProcessing, setIsProcessing] = useState(false);
     const bottomRef = useRef(null);
     const inputRef = useRef(null);
+    
+    const { playKey, playUplink } = useAudio();
 
     // Focus input on mount
     useEffect(() => {
@@ -135,6 +138,11 @@ const Terminal = () => {
 
         for (let i = 0; i < steps.length; i++) {
             setHistory(prev => [...prev, { type: 'output', text: steps[i] }]);
+            if (i === steps.length - 1) {
+                playUplink();
+            } else {
+                playKey();
+            }
             await new Promise(r => setTimeout(r, 450 + Math.random() * 200));
         }
     };
@@ -144,6 +152,11 @@ const Terminal = () => {
         const cmd = input;
         setInput('');
         runCommandSimulation(cmd);
+    };
+
+    const handleInputChange = (e) => {
+        setInput(e.target.value);
+        playKey();
     };
 
     return (
@@ -232,7 +245,7 @@ const Terminal = () => {
                             ref={inputRef}
                             type="text"
                             value={input}
-                            onChange={(e) => setInput(e.target.value)}
+                            onChange={handleInputChange}
                             disabled={isProcessing}
                             className="flex-grow bg-transparent border-none outline-none font-mono text-xs md:text-sm text-white focus:ring-0 p-0"
                             autoComplete="off"
