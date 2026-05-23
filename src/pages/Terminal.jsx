@@ -60,7 +60,8 @@ const Terminal = () => {
                     { type: 'output', text: '  brand             Print branding vector ASCII representation' },
                     { type: 'output', text: '  capabilities      Display AI agent node service configurations' },
                     { type: 'output', text: '  agent run <name>  Deploy a custom agent node (recon | database | synthesis)' },
-                    { type: 'output', text: '  clear             Flush terminal cache' }
+                    { type: 'output', text: '  clear             Flush terminal cache' },
+                    { type: 'output', text: '  <query>           Type any query to consult the Autonomix Cognitive Agent' }
                 ]);
                 break;
 
@@ -120,7 +121,86 @@ const Terminal = () => {
                 break;
 
             default:
-                setHistory(prev => [...prev, { type: 'error', text: `Command not recognized: "${cleaned}". Type "help" for valid directives.` }]);
+                setHistory(prev => [...prev, { type: 'system', text: 'SYS: CONTACTING COGNITIVE SUB-AGENT NODE...' }]);
+                try {
+                    const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+                    if (!apiKey) {
+                        throw new Error("VITE_OPENROUTER_API_KEY not set in environment.");
+                    }
+
+                    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${apiKey}`,
+                            "Content-Type": "application/json",
+                            "HTTP-Referer": window.location.origin,
+                            "X-Title": "Autonomix UI Terminal"
+                        },
+                        body: JSON.stringify({
+                            model: "openai/gpt-4.1-mini",
+                            messages: [
+                                {
+                                    role: "system",
+                                    content: "You are the Autonomix Terminal Agent, an advanced, highly intellectual autonomous sub-system. Keep your responses short, technical, and formatted like computer terminal outputs. Use technical jargon (nodes, vector, matrix, pipeline, latency, protocols, AES-256) and write in a futuristic, minimal tone. Do not use markdown styling like bold stars or headers. Output plain text suitable for a console. Keep it to 1-3 lines."
+                                },
+                                {
+                                    role: "user",
+                                    content: cmd
+                                }
+                            ]
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const data = await response.json();
+                        throw new Error(data?.error?.message || `HTTP ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    const aiText = data.choices[0].message.content.trim();
+                    playUplink();
+                    setHistory(prev => [...prev, { type: 'output', text: aiText }]);
+                } catch (err) {
+                    console.error("OpenRouter error:", err);
+                    try {
+                        const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+                        if (!apiKey) throw new Error();
+                        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                            method: "POST",
+                            headers: {
+                                "Authorization": `Bearer ${apiKey}`,
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                model: "openai/gpt-4o-mini",
+                                messages: [
+                                    {
+                                        role: "system",
+                                        content: "You are the Autonomix Terminal Agent. Keep it to 1-3 lines, technical, cold tone."
+                                    },
+                                    {
+                                        role: "user",
+                                        content: cmd
+                                    }
+                                ]
+                            })
+                        });
+                        if (response.ok) {
+                            const data = await response.json();
+                            const aiText = data.choices[0].message.content.trim();
+                            playUplink();
+                            setHistory(prev => [...prev, { type: 'output', text: aiText }]);
+                            break;
+                        }
+                    } catch {}
+                    
+                    await new Promise(r => setTimeout(r, 400));
+                    setHistory(prev => [
+                        ...prev,
+                        { type: 'error', text: `SYS ERROR: Uplink failed. Vector response simulated:` },
+                        { type: 'output', text: `LOCAL-SIM: Node processed query "${cmd}". Operational limits nominal. Request logged in transaction history.` }
+                    ]);
+                }
                 break;
         }
 

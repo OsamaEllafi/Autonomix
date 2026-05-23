@@ -7,6 +7,7 @@ import Services from './pages/Services';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Terminal from './pages/Terminal';
+import Security from './pages/Security';
 
 // Animated layout container for smooth page shifts
 const PageWrapper = ({ children }) => {
@@ -33,6 +34,7 @@ function AnimatedRoutes() {
         <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
         <Route path="/contact" element={<PageWrapper><Contact /></PageWrapper>} />
         <Route path="/terminal" element={<PageWrapper><Terminal /></PageWrapper>} />
+        <Route path="/security" element={<PageWrapper><Security /></PageWrapper>} />
       </Routes>
     </AnimatePresence>
   );

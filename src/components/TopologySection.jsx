@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Activity, HardDrive, Cpu, Terminal as TermIcon, Zap, Play, AlertOctagon, RefreshCw } from 'lucide-react';
+import { Shield, Activity, HardDrive, Cpu, Terminal as TermIcon, Zap, Play, AlertOctagon, RefreshCw, X } from 'lucide-react';
 import TiltCard from './TiltCard';
+import { useAudio } from '../hooks/useAudio';
+
 
 const TopologySection = () => {
+    const { playClick, playHover, playKey } = useAudio();
     const [status, setStatus] = useState('nominal'); // nominal, anomaly, optimizing
+    const [activeNode, setActiveNode] = useState(null);
     const [logs, setLogs] = useState([
         'SYS: System initialized. Core frequency stable.',
         'SYS: 24 active worker agents online.',
@@ -60,6 +64,63 @@ const TopologySection = () => {
         }, 3000);
     };
 
+    const nodeTelemetry = {
+        ingress: {
+            title: 'API Ingress',
+            description: 'Direct entry gateway for client telemetry payloads.',
+            latency: '2ms',
+            throughput: '4.2 GB/s',
+            status: 'Nominal',
+            detail: 'TLS v1.3 encryption active. Port 8443 open. Zero packet drop rate.'
+        },
+        router: {
+            title: 'Core Router',
+            description: 'Central cognitive dispatch for distributing payloads to worker pools.',
+            latency: '3ms',
+            throughput: '8.4 GB/s',
+            status: 'Nominal',
+            detail: 'Thread loading at 18% capacity. Dynamic scheduling active [HNSW index].'
+        },
+        recon: {
+            title: 'Recon Agent',
+            description: 'Scans data inputs and classifies intent vectors.',
+            latency: '14ms',
+            throughput: '2.1 GB/s',
+            status: 'Standby',
+            detail: 'Gemma-2B neural matrices loaded. Awaiting payload triggers.'
+        },
+        agent03: {
+            title: 'Mesh Agent-03',
+            description: 'Dedicated security broker node monitoring transactional integrity.',
+            latency: status === 'anomaly' ? '184ms' : '15ms',
+            throughput: '1.2 GB/s',
+            status: status === 'anomaly' ? 'Anomaly' : 'Nominal',
+            detail: status === 'anomaly' 
+                ? 'CRITICAL BUFFER OVERFLOW. Threat level elevated.' 
+                : 'Zero integrity failures detected. Telemetry synchronized.'
+        },
+        vector: {
+            title: 'Vector Pool',
+            description: 'High-throughput secure database storage for embeddings matrices.',
+            latency: '8ms',
+            throughput: '12.4 GB/s',
+            status: 'Nominal',
+            detail: 'Database synchronization: 100%. Persistence replication: active.'
+        }
+    };
+
+    const handleNodeClick = (nodeKey) => {
+        playClick();
+        setActiveNode(nodeKey);
+        addLog(`SYS: Inspected ${nodeTelemetry[nodeKey].title} telemetry.`);
+    };
+
+    const handleNodeReset = () => {
+        playClick();
+        setActiveNode(null);
+    };
+
+
     return (
         <section className="py-32 relative bg-white overflow-hidden border-t border-black/[0.03]">
             {/* Background elements */}
@@ -89,88 +150,179 @@ const TopologySection = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch max-w-5xl mx-auto">
                     
                     {/* Log Console & Control Room (4 cols) */}
-                    <div className="lg:col-span-4 flex flex-col justify-between glass-premium rounded-[32px] p-8 border border-white relative overflow-hidden">
-                        <div>
-                            <div className="flex items-center justify-between mb-8">
-                                <h3 className="font-header font-bold text-sm tracking-[0.2em] text-primary uppercase flex items-center gap-2">
-                                    <Activity size={16} className={status === 'anomaly' ? 'text-red-500 animate-pulse' : 'text-primary'} />
-                                    Control Room
-                                </h3>
-                                <span className={`text-[10px] font-header font-bold px-3 py-1 rounded-full uppercase tracking-wider ${
-                                    status === 'nominal' ? 'bg-emerald-500/10 text-emerald-600' :
-                                    status === 'anomaly' ? 'bg-red-500/10 text-red-600 animate-pulse' :
-                                    'bg-sky-500/10 text-sky-600'
-                                }`}>
-                                    {status}
-                                </span>
-                            </div>
+                    <div className="lg:col-span-4 flex flex-col justify-between glass-premium rounded-[32px] p-8 border border-white relative overflow-hidden min-h-[500px]">
+                        <AnimatePresence mode="wait">
+                            {!activeNode ? (
+                                <motion.div
+                                    key="control-room"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="h-full flex flex-col justify-between"
+                                >
+                                    <div>
+                                        <div className="flex items-center justify-between mb-8">
+                                            <h3 className="font-header font-bold text-sm tracking-[0.2em] text-primary uppercase flex items-center gap-2">
+                                                <Activity size={16} className={status === 'anomaly' ? 'text-red-500 animate-pulse' : 'text-primary'} />
+                                                Control Room
+                                            </h3>
+                                            <span className={`text-[10px] font-header font-bold px-3 py-1 rounded-full uppercase tracking-wider ${
+                                                status === 'nominal' ? 'bg-emerald-500/10 text-emerald-600' :
+                                                status === 'anomaly' ? 'bg-red-500/10 text-red-600 animate-pulse' :
+                                                'bg-sky-500/10 text-sky-600'
+                                            }`}>
+                                                {status}
+                                            </span>
+                                        </div>
 
-                            {/* Stats */}
-                            <div className="grid grid-cols-2 gap-4 mb-8">
-                                <div className="p-4 bg-primary/[0.02] border border-primary/[0.04] rounded-2xl">
-                                    <div className="text-[10px] font-header tracking-wider text-dim uppercase mb-1">Latency</div>
-                                    <div className="font-header font-bold text-2xl text-primary">{ping}ms</div>
-                                </div>
-                                <div className="p-4 bg-primary/[0.02] border border-primary/[0.04] rounded-2xl">
-                                    <div className="text-[10px] font-header tracking-wider text-dim uppercase mb-1">Bandwidth</div>
-                                    <div className="font-header font-bold text-2xl text-primary">
-                                        {status === 'anomaly' ? '0.8 GB/s' : status === 'optimizing' ? '8.4 GB/s' : '4.2 GB/s'}
+                                        {/* Stats */}
+                                        <div className="grid grid-cols-2 gap-4 mb-8">
+                                            <div className="p-4 bg-primary/[0.02] border border-primary/[0.04] rounded-2xl">
+                                                <div className="text-[10px] font-header tracking-wider text-dim uppercase mb-1">Latency</div>
+                                                <div className="font-header font-bold text-2xl text-primary">{ping}ms</div>
+                                            </div>
+                                            <div className="p-4 bg-primary/[0.02] border border-primary/[0.04] rounded-2xl">
+                                                <div className="text-[10px] font-header tracking-wider text-dim uppercase mb-1">Bandwidth</div>
+                                                <div className="font-header font-bold text-2xl text-primary">
+                                                    {status === 'anomaly' ? '0.8 GB/s' : status === 'optimizing' ? '8.4 GB/s' : '4.2 GB/s'}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Logs Display */}
+                                        <div className="mb-8">
+                                            <div className="text-[10px] font-header tracking-wider text-dim uppercase mb-3">Operational Logs</div>
+                                            <div className="font-mono text-[11px] leading-relaxed bg-[#0f1117] text-white/70 p-4 rounded-xl h-44 overflow-hidden flex flex-col justify-start gap-1">
+                                                <div className="flex-grow overflow-hidden flex flex-col gap-1">
+                                                    {logs.map((log, i) => (
+                                                        <div
+                                                            key={log + i}
+                                                            className={`truncate ${
+                                                                log.includes('WARN') ? 'text-amber-400' :
+                                                                log.includes('CRIT') ? 'text-red-400' :
+                                                                log.includes('SYS') ? 'text-sky-400' : 'text-emerald-400'
+                                                            }`}
+                                                        >
+                                                            &gt; {log}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
 
-                            {/* Logs Display */}
-                            <div className="mb-8">
-                                <div className="text-[10px] font-header tracking-wider text-dim uppercase mb-3">Operational Logs</div>
-                                <div className="font-mono text-[11px] leading-relaxed bg-[#0f1117] text-white/70 p-4 rounded-xl h-44 overflow-hidden flex flex-col justify-start gap-1">
-                                    <AnimatePresence>
-                                        {logs.map((log, i) => (
-                                            <motion.div
-                                                key={log + i}
-                                                initial={{ opacity: 0, x: -10 }}
-                                                animate={{ opacity: 1, x: 0 }}
-                                                exit={{ opacity: 0 }}
-                                                transition={{ duration: 0.3 }}
-                                                className={`truncate ${
-                                                    log.includes('WARN') ? 'text-amber-400' :
-                                                    log.includes('CRIT') ? 'text-red-400' :
-                                                    log.includes('SYS') ? 'text-sky-400' : 'text-emerald-400'
-                                                }`}
+                                    {/* Interactive Buttons */}
+                                    <div className="flex flex-col gap-3">
+                                        <button
+                                            onClick={handleTransmit}
+                                            className="w-full flex items-center justify-between text-xs font-header font-bold tracking-wider uppercase bg-primary text-white py-3.5 px-5 rounded-xl hover:bg-primary/95 transition-all shadow-[0_4px_12px_rgba(15,17,23,0.15)] group cursor-pointer"
+                                        >
+                                            Transmit Payload
+                                            <Play size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                                        </button>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <button
+                                                onClick={handleAnomaly}
+                                                className="flex items-center justify-center gap-2 text-[10px] font-header font-bold tracking-wider uppercase border border-red-500/20 text-red-600 bg-red-500/[0.02] hover:bg-red-500/[0.06] py-3 px-4 rounded-xl transition-all cursor-pointer"
                                             >
-                                                &gt; {log}
-                                            </motion.div>
-                                        ))}
-                                    </AnimatePresence>
-                                </div>
-                            </div>
-                        </div>
+                                                <AlertOctagon size={13} />
+                                                Inject Anomaly
+                                            </button>
+                                            <button
+                                                onClick={handleOptimize}
+                                                className="flex items-center justify-center gap-2 text-[10px] font-header font-bold tracking-wider uppercase border border-primary/10 text-primary hover:bg-primary/[0.04] py-3 px-4 rounded-xl transition-all cursor-pointer"
+                                            >
+                                                <RefreshCw size={13} className={status === 'optimizing' ? 'animate-spin' : ''} />
+                                                Optimize Nodes
+                                            </button>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ) : (
+                                <motion.div
+                                    key="node-inspector"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="h-full flex flex-col justify-between"
+                                >
+                                    <div>
+                                        <div className="flex items-center justify-between mb-8">
+                                            <h3 className="font-header font-bold text-sm tracking-[0.2em] text-primary uppercase flex items-center gap-2">
+                                                <Cpu size={16} />
+                                                Node Inspector
+                                            </h3>
+                                            <button 
+                                                onClick={handleNodeReset}
+                                                className="w-6 h-6 rounded-full border border-black/5 hover:bg-black/5 flex items-center justify-center text-primary/60 cursor-pointer"
+                                            >
+                                                <X size={12} />
+                                            </button>
+                                        </div>
 
-                        {/* Interactive Buttons */}
-                        <div className="flex flex-col gap-3">
-                            <button
-                                onClick={handleTransmit}
-                                className="w-full flex items-center justify-between text-xs font-header font-bold tracking-wider uppercase bg-primary text-white py-3.5 px-5 rounded-xl hover:bg-primary/95 transition-all shadow-[0_4px_12px_rgba(15,17,23,0.15)] group"
-                            >
-                                Transmit Payload
-                                <Play size={14} className="group-hover:translate-x-0.5 transition-transform" />
-                            </button>
-                            <div className="grid grid-cols-2 gap-3">
-                                <button
-                                    onClick={handleAnomaly}
-                                    className="flex items-center justify-center gap-2 text-[10px] font-header font-bold tracking-wider uppercase border border-red-500/20 text-red-600 bg-red-500/[0.02] hover:bg-red-500/[0.06] py-3 px-4 rounded-xl transition-all"
-                                >
-                                    <AlertOctagon size={13} />
-                                    Inject Anomaly
-                                </button>
-                                <button
-                                    onClick={handleOptimize}
-                                    className="flex items-center justify-center gap-2 text-[10px] font-header font-bold tracking-wider uppercase border border-primary/10 text-primary hover:bg-primary/[0.04] py-3 px-4 rounded-xl transition-all"
-                                >
-                                    <RefreshCw size={13} className={status === 'optimizing' ? 'animate-spin' : ''} />
-                                    Optimize Nodes
-                                </button>
-                            </div>
-                        </div>
+                                        <div className="mb-6">
+                                            <h4 className="text-xl font-header font-bold text-primary mb-2">
+                                                {nodeTelemetry[activeNode].title}
+                                            </h4>
+                                            <p className="text-xs text-dim leading-relaxed">
+                                                {nodeTelemetry[activeNode].description}
+                                            </p>
+                                        </div>
+
+                                        {/* Node Metrics */}
+                                        <div className="grid grid-cols-2 gap-4 mb-6">
+                                            <div className="p-3 bg-primary/[0.02] border border-primary/[0.04] rounded-2xl">
+                                                <div className="text-[8px] font-header tracking-wider text-dim uppercase mb-0.5">Node Latency</div>
+                                                <div className="font-header font-bold text-lg text-primary">{nodeTelemetry[activeNode].latency}</div>
+                                            </div>
+                                            <div className="p-3 bg-primary/[0.02] border border-primary/[0.04] rounded-2xl">
+                                                <div className="text-[8px] font-header tracking-wider text-dim uppercase mb-0.5">Throughput</div>
+                                                <div className="font-header font-bold text-lg text-primary">{nodeTelemetry[activeNode].throughput}</div>
+                                            </div>
+                                        </div>
+
+                                        {/* Telemetry Detail */}
+                                        <div className="p-4 bg-[#0f1117] rounded-2xl font-mono text-[10px] leading-relaxed text-sky-400 mb-8 border border-white/5">
+                                            <span className="text-white/30 uppercase block font-header text-[8px] tracking-wider mb-2">Detailed Telemetry</span>
+                                            &gt; STATUS: {nodeTelemetry[activeNode].status.toUpperCase()}<br/>
+                                            &gt; {nodeTelemetry[activeNode].detail}
+                                        </div>
+                                    </div>
+
+                                    {/* Action Buttons */}
+                                    <div className="flex flex-col gap-3">
+                                        <button
+                                            onClick={() => {
+                                                playKey();
+                                                addLog(`DIAG: Running active scan on ${nodeTelemetry[activeNode].title}...`);
+                                                setTimeout(() => {
+                                                    addLog(`DIAG: ${nodeTelemetry[activeNode].title} status: nominal.`);
+                                                    playUplink();
+                                                }, 1200);
+                                            }}
+                                            className="w-full flex items-center justify-center gap-2 text-xs font-header font-bold tracking-wider uppercase bg-primary text-white py-3.5 px-5 rounded-xl hover:bg-primary/95 transition-all cursor-pointer"
+                                        >
+                                            <Activity size={14} /> Run Node Diagnostics
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                playKey();
+                                                addLog(`SYS: Rebooting vector threads on node ${nodeTelemetry[activeNode].title}...`);
+                                                setTimeout(() => {
+                                                    addLog(`SYS: Node threads fully recovered.`);
+                                                    playUplink();
+                                                }, 1500);
+                                            }}
+                                            className="w-full text-center text-[10px] font-header font-bold tracking-wider uppercase border border-primary/10 text-primary hover:bg-primary/[0.04] py-3 px-4 rounded-xl transition-all cursor-pointer"
+                                        >
+                                            Reboot Threads
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
 
                     {/* Node Interactive Canvas (8 cols) */}
@@ -304,8 +456,10 @@ const TopologySection = () => {
 
                         {/* Interactive Node Cards */}
                         <div className="absolute left-4 top-[210px] z-10 w-24">
-                            <TiltCard>
-                                <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-black/[0.04] p-3 text-center shadow-lg hover:shadow-xl transition-all duration-300">
+                            <TiltCard onClick={() => handleNodeClick('ingress')}>
+                                <div className={`backdrop-blur-md rounded-2xl p-3 text-center shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border ${
+                                    activeNode === 'ingress' ? 'border-primary ring-2 ring-primary/20 bg-primary/[0.02]' : 'border-black/[0.04] bg-white/80'
+                                }`}>
                                     <div className="w-8 h-8 mx-auto rounded-xl bg-primary/[0.04] flex items-center justify-center text-primary/70 mb-2">
                                         <TermIcon size={16} />
                                     </div>
@@ -316,8 +470,10 @@ const TopologySection = () => {
                         </div>
 
                         <div className="absolute left-[240px] top-[200px] z-10 w-28">
-                            <TiltCard>
-                                <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-black/[0.04] p-3.5 text-center shadow-lg hover:shadow-xl transition-all duration-300">
+                            <TiltCard onClick={() => handleNodeClick('router')}>
+                                <div className={`backdrop-blur-md rounded-2xl p-3.5 text-center shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border ${
+                                    activeNode === 'router' ? 'border-primary ring-2 ring-primary/20 bg-primary/[0.02]' : 'border-black/[0.04] bg-white/80'
+                                }`}>
                                     <div className="w-8 h-8 mx-auto rounded-xl bg-primary/[0.04] flex items-center justify-center text-primary/70 mb-2">
                                         <Cpu size={16} />
                                     </div>
@@ -328,8 +484,10 @@ const TopologySection = () => {
                         </div>
 
                         <div className="absolute left-[460px] top-[100px] z-10 w-28">
-                            <TiltCard>
-                                <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-black/[0.04] p-3.5 text-center shadow-lg hover:shadow-xl transition-all duration-300">
+                            <TiltCard onClick={() => handleNodeClick('recon')}>
+                                <div className={`backdrop-blur-md rounded-2xl p-3.5 text-center shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border ${
+                                    activeNode === 'recon' ? 'border-primary ring-2 ring-primary/20 bg-primary/[0.02]' : 'border-black/[0.04] bg-white/80'
+                                }`}>
                                     <div className="w-8 h-8 mx-auto rounded-xl bg-primary/[0.04] flex items-center justify-center text-primary/70 mb-2">
                                         <Zap size={16} />
                                     </div>
@@ -342,20 +500,21 @@ const TopologySection = () => {
                         <div className={`absolute left-[460px] top-[300px] z-10 w-28 transition-colors duration-500 rounded-2xl ${
                             status === 'anomaly' ? 'ring-2 ring-red-500/50' : ''
                         }`}>
-                            <TiltCard>
-                                <div className={`backdrop-blur-md rounded-2xl border p-3.5 text-center shadow-lg transition-all duration-300 ${
+                            <TiltCard onClick={() => handleNodeClick('agent03')}>
+                                <div className={`backdrop-blur-md rounded-2xl border p-3.5 text-center shadow-lg transition-all duration-300 cursor-pointer ${
+                                    activeNode === 'agent03' ? 'border-primary ring-2 ring-primary/20 bg-primary/[0.02]' :
                                     status === 'anomaly' ? 'bg-red-500/[0.05] border-red-500/20' : 'bg-white/80 border-black/[0.04]'
                                 }`}>
                                     <div className={`w-8 h-8 mx-auto rounded-xl flex items-center justify-center mb-2 ${
-                                        status === 'anomaly' ? 'bg-red-500/10 text-red-600' : 'bg-primary/[0.04] text-primary/70'
+                                        status === 'anomaly' && activeNode !== 'agent03' ? 'bg-red-500/10 text-red-600' : 'bg-primary/[0.04] text-primary/70'
                                     }`}>
                                         <Shield size={16} className={status === 'anomaly' ? 'animate-bounce' : ''} />
                                     </div>
                                     <h4 className={`font-header text-[8px] tracking-[0.1em] uppercase font-bold ${
-                                        status === 'anomaly' ? 'text-red-700' : 'text-primary'
+                                        status === 'anomaly' && activeNode !== 'agent03' ? 'text-red-700' : 'text-primary'
                                     }`}>Mesh Agent-03</h4>
                                     <p className={`text-[7px] uppercase mt-1 font-mono ${
-                                        status === 'anomaly' ? 'text-red-500 font-bold' : 'text-dim'
+                                        status === 'anomaly' && activeNode !== 'agent03' ? 'text-red-500 font-bold' : 'text-dim'
                                     }`}>
                                         {status === 'anomaly' ? 'SPIKE 184ms' : 'Status: OK'}
                                     </p>
@@ -364,8 +523,10 @@ const TopologySection = () => {
                         </div>
 
                         <div className="absolute right-4 top-[200px] z-10 w-28">
-                            <TiltCard>
-                                <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-black/[0.04] p-3.5 text-center shadow-lg hover:shadow-xl transition-all duration-300">
+                            <TiltCard onClick={() => handleNodeClick('vector')}>
+                                <div className={`backdrop-blur-md rounded-2xl p-3.5 text-center shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border ${
+                                    activeNode === 'vector' ? 'border-primary ring-2 ring-primary/20 bg-primary/[0.02]' : 'border-black/[0.04] bg-white/80'
+                                }`}>
                                     <div className="w-8 h-8 mx-auto rounded-xl bg-primary/[0.04] flex items-center justify-center text-primary/70 mb-2">
                                         <HardDrive size={16} />
                                     </div>
@@ -374,6 +535,7 @@ const TopologySection = () => {
                                 </div>
                             </TiltCard>
                         </div>
+
 
                     </div>
                 </div>

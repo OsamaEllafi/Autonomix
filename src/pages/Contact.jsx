@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Send, MapPin, Phone, Mail, ArrowRight, ShieldCheck, RefreshCw, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAudio } from '../hooks/useAudio';
@@ -10,6 +10,36 @@ const Contact = () => {
     const [form, setForm] = useState({ firstName: '', lastName: '', email: '', message: '' });
     const [status, setStatus] = useState('idle'); // idle, transmitting, success, error
     const [uplinkLogs, setUplinkLogs] = useState([]);
+    const [blueprintLoaded, setBlueprintLoaded] = useState(false);
+
+    useEffect(() => {
+        const stored = localStorage.getItem('autonomix_exported_blueprint');
+        if (stored) {
+            try {
+                const bp = JSON.parse(stored);
+                setForm(prev => ({
+                    ...prev,
+                    message: `[AUTONOMIX BLUEPRINT EXPORT]
+NODE TYPE: ${bp.serviceTitle}
+COGNITIVE ENGINE: ${bp.model}
+CONCURRENCY THREADS: ${bp.concurrency} Nodes
+BUFFER ALLOCATION: ${bp.buffer} MB
+CALCULATED LATENCY: ${bp.latency} ms
+VECTOR THROUGHPUT: ${bp.throughput}
+SECURITY FRAMEWORK: ${bp.security}
+
+Please specify any custom enterprise requirements:
+`
+                }));
+                setBlueprintLoaded(true);
+                playUplink();
+                localStorage.removeItem('autonomix_exported_blueprint');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    }, [playUplink]);
+
 
     const handleInputChange = (field, value) => {
         setForm(prev => ({ ...prev, [field]: value }));
@@ -175,6 +205,12 @@ const Contact = () => {
                                         onSubmit={handleFormSubmit}
                                         className="space-y-10 relative z-10"
                                     >
+                                        {blueprintLoaded && (
+                                            <div className="flex items-center gap-2.5 px-4 py-3 bg-emerald-500/[0.05] border border-emerald-500/10 rounded-2xl text-[10px] font-header font-bold text-emerald-600 tracking-wider">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                                EXPORTED SYSTEM BLUEPRINT ACTIVE & PRE-LOADED
+                                            </div>
+                                        )}
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                                             <div className="space-y-3 relative group">
                                                 <label className="text-[10px] uppercase tracking-[0.2em] text-primary/60 font-bold block transition-colors group-focus-within:text-primary">Identification / First</label>

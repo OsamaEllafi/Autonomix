@@ -1,6 +1,7 @@
 import React from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import AIAssistant from './AIAssistant';
 
 const Layout = ({ children }) => {
   return (
@@ -15,8 +16,12 @@ const Layout = ({ children }) => {
 
       {/* Footer - Above canvas */}
       <Footer />
+
+      {/* Global AI Assistant Floating Widget */}
+      <AIAssistant />
     </div>
   );
 };
 
 export default Layout;
+

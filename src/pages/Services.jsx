@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Bot, Code, Workflow, Smartphone, Database, Brain, X, Sliders, Cpu, Activity, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import TiltCard from '../components/TiltCard';
 import { useAudio } from '../hooks/useAudio';
 import { useSEO } from '../hooks/useSEO';
@@ -88,9 +89,26 @@ const services = [
 
 const Services = () => {
     useSEO('Infrastructure Blueprints', 'Explore custom enterprise automation, autonomous reasoning agents, and zero-trust vector infrastructure.');
+    const navigate = useNavigate();
     const { playClick, playHover, playKey } = useAudio();
     const [selectedService, setSelectedService] = useState(null);
     const [config, setConfig] = useState({ concurrency: 100, buffer: 16 });
+
+    const handleExportBlueprint = () => {
+        playClick();
+        if (!selectedService) return;
+        const blueprint = {
+            serviceTitle: selectedService.title,
+            model: selectedService.specs.model,
+            concurrency: config.concurrency,
+            buffer: config.buffer,
+            latency: getCalculatedLatency(),
+            throughput: getCalculatedThroughput(),
+            security: selectedService.specs.security
+        };
+        localStorage.setItem('autonomix_exported_blueprint', JSON.stringify(blueprint));
+        navigate('/contact');
+    };
 
     const handleOpenDrawer = (service) => {
         playClick();
@@ -322,6 +340,12 @@ const Services = () => {
                                     className="w-full py-4 bg-primary text-white rounded-xl font-header font-bold text-xs tracking-widest uppercase hover:bg-primary/95 transition-all shadow-lg shadow-black/[0.08] cursor-pointer mt-4"
                                 >
                                     Deploy Configuration
+                                </button>
+                                <button 
+                                    onClick={handleExportBlueprint}
+                                    className="w-full py-3.5 border border-black/10 hover:bg-black/[0.03] text-primary rounded-xl font-header font-bold text-xs tracking-widest uppercase transition-all cursor-pointer text-center"
+                                >
+                                    Export Blueprint to Comms
                                 </button>
                             </div>
                         </motion.div>

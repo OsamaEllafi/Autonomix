@@ -45,6 +45,7 @@ const Navbar = () => {
         { name: 'Home', path: '/' },
         { name: 'Services', path: '/services' },
         { name: 'About', path: '/about' },
+        { name: 'Security', path: '/security' },
         { name: 'Contact', path: '/contact' },
         { name: 'Terminal', path: '/terminal' },
     ];
@@ -56,7 +57,7 @@ const Navbar = () => {
                         ? 'bg-white/80 backdrop-blur-xl shadow-lg shadow-black/[0.04] border border-black/[0.06]'
                         : 'bg-white/50 backdrop-blur-md border border-transparent'
                     }`}
-                style={{ maxWidth: '760px', width: '100%' }}
+                style={{ maxWidth: '840px', width: '100%' }}
             >
                 <div className="flex items-center gap-3">
                     <Link 
@@ -70,7 +71,7 @@ const Navbar = () => {
                     
                     {/* Pulsing System Status Tag */}
                     <Link 
-                        to="/terminal" 
+                        to="/security" 
                         onClick={playClick}
                         onMouseEnter={playHover}
                         className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-emerald-500/[0.05] border border-emerald-500/10 rounded-full text-[8px] font-header font-bold text-emerald-600 tracking-wider hover:bg-emerald-500/10 transition-colors uppercase select-none"
