@@ -24,8 +24,8 @@ const ProcessSection = () => {
             <div className="container relative z-10 max-w-6xl">
                 <motion.div
                     className="text-center mb-32"
-                    initial={{ opacity: 0, y: 30, filter: 'blur(8px)' }}
-                    whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                     viewport={{ once: true, margin: "-100px" }}
                 >
@@ -70,8 +70,8 @@ const ProcessStep = ({ step, index }) => {
 
             {/* Content Box */}
             <motion.div
-                initial={{ opacity: 0, x: isEven ? 40 : -40, filter: 'blur(10px)' }}
-                whileInView={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+                initial={{ opacity: 0, x: isEven ? 40 : -40 }}
+                whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
                 viewport={{ once: true, margin: "-20%" }}
                 className={`w-full md:w-1/2 relative pl-16 md:pl-0 ${isEven ? 'md:pr-12 lg:pr-24 text-left' : 'md:pl-12 lg:pl-24 md:text-right'}`}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Shield, Zap, Globe, Cpu } from 'lucide-react';
 import { motion } from 'framer-motion';
+import TiltCard from './TiltCard';
 
 const features = [
     { icon: <Zap size={28} strokeWidth={1.5} />, title: 'Lightning Fast', description: 'Optimized for speed with edge computing and distributed architecture. Expect sub-millisecond latency globally.' },
@@ -18,8 +19,8 @@ const FeaturesSection = () => {
             <div className="container relative z-10">
                 <motion.div
                     className="text-center mb-24"
-                    initial={{ opacity: 0, y: 30, filter: 'blur(8px)' }}
-                    whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                     viewport={{ once: true, margin: "-100px" }}
                 >
@@ -57,28 +58,31 @@ const FeaturesSection = () => {
 const FeatureCard = ({ feature, index }) => {
     return (
         <motion.div
-            initial={{ opacity: 0, y: 50, filter: 'blur(10px)' }}
-            whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: index * 0.1 }}
             viewport={{ once: true, margin: "-100px" }}
+            className="perspective-1000"
         >
-            <motion.div
-                // Antigravity drift
-                animate={{ y: [0, -12, 0] }}
-                transition={{
-                    duration: 6 + (index % 3),
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: index * 0.4
-                }}
-                className="glass-premium p-10 md:p-12 rounded-[32px] group relative overflow-hidden"
-            >
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-primary/[0.04] text-primary/70 mb-8 transition-colors duration-500 group-hover:bg-primary/[0.08] group-hover:text-primary">
-                    {feature.icon}
-                </div>
-                <h3 className="text-xl font-bold mb-4 text-primary font-header tracking-wide">{feature.title}</h3>
-                <p className="text-dim text-base leading-relaxed">{feature.description}</p>
-            </motion.div>
+            <TiltCard>
+                <motion.div
+                    // Antigravity drift
+                    animate={{ y: [0, -12, 0] }}
+                    transition={{
+                        duration: 6 + (index % 3),
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        delay: index * 0.4
+                    }}
+                    className="glass-premium p-10 md:p-12 rounded-[32px] group relative overflow-hidden"
+                >
+                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-primary/[0.04] text-primary/70 mb-8 transition-colors duration-500 group-hover:bg-primary/[0.08] group-hover:text-primary">
+                        {feature.icon}
+                    </div>
+                    <h3 className="text-xl font-bold mb-4 text-primary font-header tracking-wide">{feature.title}</h3>
+                    <p className="text-dim text-base leading-relaxed">{feature.description}</p>
+                </motion.div>
+            </TiltCard>
         </motion.div>
     );
 };

@@ -33,7 +33,7 @@ const Footer = () => {
                     <nav className="flex justify-center overflow-hidden">
                         <ul className="flex items-center justify-center flex-wrap sm:flex-nowrap gap-4 sm:gap-8 lg:gap-10 xl:gap-14">
                             {[
-                                { name: 'Terminal', path: '/' },
+                                { name: 'Terminal', path: '/terminal' },
                                 { name: 'Capabilities', path: '/services' },
                                 { name: 'Manifesto', path: '/about' },
                                 { name: 'Comms', path: '/contact' },
