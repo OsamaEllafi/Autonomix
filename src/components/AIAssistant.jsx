@@ -37,6 +37,9 @@ const AIAssistant = () => {
         setIsLoading(true);
 
         try {
+            // Vite bakes VITE_* vars at build time.
+            // Locally: set VITE_OPENROUTER_API_KEY in .env
+            // GitHub Pages: add VITE_OPENROUTER_API_KEY as a repository Actions secret
             const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
             if (!apiKey) {
                 throw new Error("VITE_OPENROUTER_API_KEY not configured.");

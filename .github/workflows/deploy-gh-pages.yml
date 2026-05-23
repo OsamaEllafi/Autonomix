@@ -37,6 +37,10 @@ jobs:
         env:
           # Project Pages: site at https://<user>.github.io/<repo-name>/
           VITE_BASE_PATH: /${{ github.event.repository.name }}/
+          # OpenRouter API key – add this as a repository secret:
+          # GitHub → Settings → Secrets and variables → Actions → New repository secret
+          # Name: VITE_OPENROUTER_API_KEY  Value: sk-or-v1-...
+          VITE_OPENROUTER_API_KEY: ${{ secrets.VITE_OPENROUTER_API_KEY }}
         run: npm run build
 
       - name: SPA fallback for client-side routes
