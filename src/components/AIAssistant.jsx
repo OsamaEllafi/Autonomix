@@ -67,7 +67,8 @@ const AIAssistant = () => {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
+                const errBody = await response.text().catch(() => '');
+                throw new Error(`HTTP ${response.status}: ${errBody.slice(0, 120)}`);
             }
 
             const data = await response.json();
@@ -112,7 +113,7 @@ const AIAssistant = () => {
             await new Promise(r => setTimeout(r, 600));
             setMessages(prev => [...prev, { 
                 role: 'assistant', 
-                content: 'Notice: Network link latency exceeded. Please try re-initiating transmission or contact systems@autonomix.ai.' 
+                content: `Transmission error: ${err.message || 'Unknown'}. Check browser console (F12) for details. If this persists, contact systems@autonomix.ai.` 
             }]);
         } finally {
             setIsLoading(false);
